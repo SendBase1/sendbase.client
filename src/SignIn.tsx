@@ -36,7 +36,8 @@ function SignIn() {
         setLoading(true);
 
         try {
-            const endpoint = isRegistering ? '/api/auth/register' : '/api/auth/login';
+            const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || '';
+            const endpoint = isRegistering ? `${apiBaseUrl}/api/auth/register` : `${apiBaseUrl}/api/auth/login`;
             const body = isRegistering
                 ? { email, password, confirmPassword }
                 : { email, password };
