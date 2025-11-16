@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(dotnet add package:*)",
+      "Bash(dotnet ef migrations:*)",
+      "Bash(npm install)",
+      "Bash(powershell:*)",
+      "Bash(npm install:*)",
+      "Bash(taskkill:*)",
+      "Bash(nul)",
+      "Bash(exit 0)",
+      "Bash(timeout:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx tailwindcss:*)",
+      "Bash(npx shadcn@latest add:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
