@@ -6,9 +6,10 @@ import type {
   SendEmailRequest,
   PaginatedResponse,
 } from './types';
+import { API_BASE_URL } from './config';
 
-// API configuration
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+// Re-export for backward compatibility
+export { API_BASE_URL };
 
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const token = localStorage.getItem('authToken');

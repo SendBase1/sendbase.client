@@ -8,6 +8,7 @@ import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
 import { Label } from '../../components/ui/label';
 import { Textarea } from '../../components/ui/textarea';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import {
   Select,
   SelectContent,
@@ -16,7 +17,8 @@ import {
   SelectValue,
 } from '../../components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
-import { Plus, X, Send, Mail } from 'lucide-react';
+import { Alert, AlertDescription } from '../../components/ui/alert';
+import { Plus, X, Send, Mail, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import type { SendEmailRequest } from '../../lib/types';
 
@@ -91,7 +93,6 @@ export function SendEmailPage() {
 
   const onSubmit = async (data: SendEmailFormData) => {
     try {
-      // Filter out empty recipients
       const cleanedData: SendEmailRequest = {
         ...data,
         to: data.to.filter(r => r.email),
@@ -102,7 +103,6 @@ export function SendEmailPage() {
       const result = await sendEmail.mutateAsync(cleanedData);
       toast.success(`Email sent successfully! Message ID: ${result.messageId}`);
 
-      // Reset form
       reset({
         to: [{ email: '', name: '' }],
         cc: [],
@@ -118,263 +118,283 @@ export function SendEmailPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 space-y-6 p-8">
       {/* Header */}
       <div>
         <h2 className="text-3xl font-bold tracking-tight">Send Email</h2>
-        <p className="text-gray-500 mt-1">
+        <p className="text-muted-foreground mt-1">
           Compose and send emails using your verified domains
         </p>
       </div>
 
+      {/* Alert for no verified domains */}
+      {verifiedDomains.length === 0 && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            No verified domains available. Please verify at least one domain before sending emails.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Main Form */}
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         {/* From Section */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold mb-4">From</h3>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="domain">Domain *</Label>
-              <Select value={selectedDomain} onValueChange={handleDomainChange}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a verified domain" />
-                </SelectTrigger>
-                <SelectContent>
-                  {verifiedDomains.length > 0 ? (
-                    verifiedDomains.map((domain) => (
-                      <SelectItem key={domain.id} value={domain.domain}>
-                        {domain.domain}
+        <Card>
+          <CardHeader>
+            <CardTitle>From</CardTitle>
+            <CardDescription>Configure the sender information</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="domain">Domain *</Label>
+                <Select value={selectedDomain} onValueChange={handleDomainChange}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a verified domain" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {verifiedDomains.length > 0 ? (
+                      verifiedDomains.map((domain) => (
+                        <SelectItem key={domain.id} value={domain.domain}>
+                          {domain.domain}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="no-domains" disabled>
+                        No verified domains available
                       </SelectItem>
-                    ))
-                  ) : (
-                    <SelectItem value="" disabled>
-                      No verified domains available
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </Select>
-              {verifiedDomains.length === 0 && (
-                <p className="text-xs text-red-600">
-                  Please verify at least one domain before sending emails
-                </p>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="fromName">From Name</Label>
+                <Input
+                  id="fromName"
+                  placeholder="e.g., noreply, support, hello"
+                  {...register('fromName')}
+                  onChange={(e) => handleFromNameChange(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="fromEmail">From Email *</Label>
+              <Input
+                id="fromEmail"
+                placeholder="noreply@example.com"
+                {...register('fromEmail')}
+                disabled
+                className="bg-muted"
+              />
+              {errors.fromEmail && (
+                <p className="text-sm text-destructive">{errors.fromEmail.message}</p>
               )}
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="fromName">From Name</Label>
-              <Input
-                id="fromName"
-                placeholder="e.g., noreply, support, hello"
-                {...register('fromName')}
-                onChange={(e) => handleFromNameChange(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="mt-4 space-y-2">
-            <Label htmlFor="fromEmail">From Email *</Label>
-            <Input
-              id="fromEmail"
-              placeholder="noreply@example.com"
-              {...register('fromEmail')}
-              disabled
-              className="bg-gray-50"
-            />
-            {errors.fromEmail && (
-              <p className="text-xs text-red-600">{errors.fromEmail.message}</p>
-            )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
         {/* Recipients Section */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold mb-4">Recipients</h3>
-
-          {/* To Recipients */}
-          <div className="space-y-3">
-            <Label>To *</Label>
-            {toFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2">
-                <div className="flex-1 grid grid-cols-2 gap-2">
-                  <Input
-                    placeholder="Email address"
-                    {...register(`to.${index}.email`)}
-                  />
-                  <Input
-                    placeholder="Name (optional)"
-                    {...register(`to.${index}.name`)}
-                  />
+        <Card>
+          <CardHeader>
+            <CardTitle>Recipients</CardTitle>
+            <CardDescription>Add email recipients, CC, and BCC</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {/* To Recipients */}
+            <div className="space-y-3">
+              <Label>To *</Label>
+              {toFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2">
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <Input
+                      placeholder="Email address"
+                      {...register(`to.${index}.email`)}
+                    />
+                    <Input
+                      placeholder="Name (optional)"
+                      {...register(`to.${index}.name`)}
+                    />
+                  </div>
+                  {toFields.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => removeTo(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
-                {toFields.length > 1 && (
+              ))}
+              {errors.to && (
+                <p className="text-sm text-destructive">
+                  {errors.to.message || errors.to[0]?.email?.message}
+                </p>
+              )}
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => appendTo({ email: '', name: '' })}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Recipient
+              </Button>
+            </div>
+
+            {/* CC Recipients */}
+            <div className="space-y-3">
+              <Label>CC</Label>
+              {ccFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2">
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <Input
+                      placeholder="Email address"
+                      {...register(`cc.${index}.email`)}
+                    />
+                    <Input
+                      placeholder="Name (optional)"
+                      {...register(`cc.${index}.name`)}
+                    />
+                  </div>
                   <Button
                     type="button"
                     variant="ghost"
-                    size="sm"
-                    onClick={() => removeTo(index)}
+                    size="icon"
+                    onClick={() => removeCc(index)}
                   >
                     <X className="h-4 w-4" />
                   </Button>
-                )}
-              </div>
-            ))}
-            {errors.to && (
-              <p className="text-xs text-red-600">
-                {errors.to.message || errors.to[0]?.email?.message}
-              </p>
-            )}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => appendTo({ email: '', name: '' })}
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Recipient
-            </Button>
-          </div>
-
-          {/* CC Recipients */}
-          <div className="mt-6 space-y-3">
-            <Label>CC</Label>
-            {ccFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2">
-                <div className="flex-1 grid grid-cols-2 gap-2">
-                  <Input
-                    placeholder="Email address"
-                    {...register(`cc.${index}.email`)}
-                  />
-                  <Input
-                    placeholder="Name (optional)"
-                    {...register(`cc.${index}.name`)}
-                  />
                 </div>
+              ))}
+              {ccFields.length === 0 && (
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  onClick={() => removeCc(index)}
+                  onClick={() => appendCc({ email: '', name: '' })}
                 >
-                  <X className="h-4 w-4" />
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add CC
                 </Button>
-              </div>
-            ))}
-            {ccFields.length === 0 && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => appendCc({ email: '', name: '' })}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add CC
-              </Button>
-            )}
-          </div>
+              )}
+            </div>
 
-          {/* BCC Recipients */}
-          <div className="mt-6 space-y-3">
-            <Label>BCC</Label>
-            {bccFields.map((field, index) => (
-              <div key={field.id} className="flex gap-2">
-                <div className="flex-1 grid grid-cols-2 gap-2">
-                  <Input
-                    placeholder="Email address"
-                    {...register(`bcc.${index}.email`)}
-                  />
-                  <Input
-                    placeholder="Name (optional)"
-                    {...register(`bcc.${index}.name`)}
-                  />
+            {/* BCC Recipients */}
+            <div className="space-y-3">
+              <Label>BCC</Label>
+              {bccFields.map((field, index) => (
+                <div key={field.id} className="flex gap-2">
+                  <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <Input
+                      placeholder="Email address"
+                      {...register(`bcc.${index}.email`)}
+                    />
+                    <Input
+                      placeholder="Name (optional)"
+                      {...register(`bcc.${index}.name`)}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeBcc(index)}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
+              ))}
+              {bccFields.length === 0 && (
                 <Button
                   type="button"
-                  variant="ghost"
+                  variant="outline"
                   size="sm"
-                  onClick={() => removeBcc(index)}
+                  onClick={() => appendBcc({ email: '', name: '' })}
                 >
-                  <X className="h-4 w-4" />
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add BCC
                 </Button>
-              </div>
-            ))}
-            {bccFields.length === 0 && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={() => appendBcc({ email: '', name: '' })}
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Add BCC
-              </Button>
-            )}
-          </div>
-        </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Subject */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="space-y-2">
-            <Label htmlFor="subject">Subject *</Label>
-            <Input
-              id="subject"
-              placeholder="Enter email subject"
-              {...register('subject')}
-            />
-            {errors.subject && (
-              <p className="text-xs text-red-600">{errors.subject.message}</p>
-            )}
-          </div>
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Subject</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <Input
+                id="subject"
+                placeholder="Enter email subject"
+                {...register('subject')}
+              />
+              {errors.subject && (
+                <p className="text-sm text-destructive">{errors.subject.message}</p>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Email Body */}
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold mb-4">Message</h3>
+        <Card>
+          <CardHeader>
+            <CardTitle>Message</CardTitle>
+            <CardDescription>Compose your email content in HTML or plain text</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="html">
+              <TabsList className="mb-4">
+                <TabsTrigger value="html">HTML</TabsTrigger>
+                <TabsTrigger value="text">Plain Text</TabsTrigger>
+              </TabsList>
 
-          <Tabs defaultValue="html">
-            <TabsList className="mb-4">
-              <TabsTrigger value="html">HTML</TabsTrigger>
-              <TabsTrigger value="text">Plain Text</TabsTrigger>
-            </TabsList>
+              <TabsContent value="html" className="space-y-2">
+                <Textarea
+                  id="htmlBody"
+                  placeholder="<html><body><h1>Hello!</h1><p>Your message here...</p></body></html>"
+                  rows={12}
+                  {...register('htmlBody')}
+                  className="font-mono text-sm"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Enter HTML content for rich-formatted emails
+                </p>
+              </TabsContent>
 
-            <TabsContent value="html" className="space-y-2">
-              <Label htmlFor="htmlBody">HTML Body</Label>
-              <Textarea
-                id="htmlBody"
-                placeholder="<html><body><h1>Hello!</h1><p>Your message here...</p></body></html>"
-                rows={12}
-                {...register('htmlBody')}
-                className="font-mono text-sm"
-              />
-              <p className="text-xs text-gray-500">
-                Enter HTML content for rich-formatted emails
-              </p>
-            </TabsContent>
-
-            <TabsContent value="text" className="space-y-2">
-              <Label htmlFor="textBody">Plain Text Body</Label>
-              <Textarea
-                id="textBody"
-                placeholder="Enter plain text message here..."
-                rows={12}
-                {...register('textBody')}
-              />
-              <p className="text-xs text-gray-500">
-                Fallback text for email clients that don't support HTML
-              </p>
-            </TabsContent>
-          </Tabs>
-        </div>
+              <TabsContent value="text" className="space-y-2">
+                <Textarea
+                  id="textBody"
+                  placeholder="Enter plain text message here..."
+                  rows={12}
+                  {...register('textBody')}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Fallback text for email clients that don't support HTML
+                </p>
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
 
         {/* Submit Button */}
-        <div className="flex items-center justify-between bg-white rounded-lg border border-gray-200 p-6">
-          <div className="text-sm text-gray-500">
+        <div className="flex items-center justify-between">
+          <div className="text-sm text-muted-foreground">
             {verifiedDomains.length === 0 ? (
-              <span className="text-red-600">
-                <Mail className="h-4 w-4 inline mr-1" />
+              <span className="text-destructive flex items-center gap-2">
+                <Mail className="h-4 w-4" />
                 No verified domains available
               </span>
             ) : (
-              <span>
+              <span className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
                 Ready to send from {verifiedDomains.length} verified domain(s)
               </span>
             )}
@@ -382,7 +402,7 @@ export function SendEmailPage() {
           <Button
             type="submit"
             disabled={sendEmail.isPending || verifiedDomains.length === 0}
-            className="min-w-[120px]"
+            size="lg"
           >
             {sendEmail.isPending ? (
               'Sending...'

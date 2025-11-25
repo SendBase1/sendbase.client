@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { useDomains, useCreateDomain, useDeleteDomain, useVerifyDomain } from '../../hooks/useDomains';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
+import { Card, CardContent } from '../../components/ui/card';
 import {
   Table,
   TableBody,
@@ -73,7 +74,6 @@ export function DomainsPage() {
 
   const selectedRegion = watch('region');
 
-  // Check if this is the first domain in the selected region
   const isFirstDomainInRegion = (region: string) => {
     return !domains?.some(d => d.region === region);
   };
@@ -86,7 +86,6 @@ export function DomainsPage() {
       setIsAddModalOpen(false);
       reset();
 
-      // Enhanced success message
       if (isFirstInRegion) {
         toast.success(
           `Domain created successfully! AWS infrastructure configured for ${data.region}.`,
@@ -96,7 +95,6 @@ export function DomainsPage() {
         toast.success('Domain created successfully! Please configure DNS records.');
       }
     } catch (error: any) {
-      // Enhanced error handling
       const errorMessage = error.message || 'Failed to create domain';
 
       if (errorMessage.includes('already exists')) {
@@ -131,7 +129,7 @@ export function DomainsPage() {
     }
   };
 
-  const getStatusBadge = (status: number, text: string) => {
+  const getStatusBadge = (_status: number, text: string) => {
     const variants: Record<string, any> = {
       Verified: 'default',
       Success: 'default',
@@ -148,18 +146,18 @@ export function DomainsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="h-8 w-8 animate-spin text-gray-400" />
+        <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 space-y-6 p-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Domains</h2>
-          <p className="text-gray-500 mt-1">
+          <p className="text-muted-foreground mt-1">
             Manage your verified sending domains
           </p>
         </div>
@@ -171,78 +169,82 @@ export function DomainsPage() {
 
       {/* Domains Table */}
       {domains && domains.length > 0 ? (
-        <div className="bg-white rounded-lg border border-gray-200">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Domain</TableHead>
-                <TableHead>Region</TableHead>
-                <TableHead>Verification</TableHead>
-                <TableHead>DKIM</TableHead>
-                <TableHead>Created</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {domains.map((domain) => (
-                <TableRow key={domain.id}>
-                  <TableCell className="font-medium">{domain.domain}</TableCell>
-                  <TableCell>
-                    <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                      {domain.region}
-                    </code>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(domain.verificationStatus, domain.verificationStatusText)}
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(domain.dkimStatus, domain.dkimStatusText)}
-                  </TableCell>
-                  <TableCell>
-                    {new Date(domain.createdAtUtc).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell className="text-right space-x-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => navigate(`/domains/${domain.id}`)}
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleVerifyDomain(domain.id)}
-                      disabled={verifyDomain.isPending}
-                    >
-                      <RefreshCw className={`h-4 w-4 ${verifyDomain.isPending ? 'animate-spin' : ''}`} />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleDeleteDomain(domain.id, domain.domain)}
-                      disabled={deleteDomain.isPending}
-                    >
-                      <Trash2 className="h-4 w-4 text-red-600" />
-                    </Button>
-                  </TableCell>
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Domain</TableHead>
+                  <TableHead>Region</TableHead>
+                  <TableHead>Verification</TableHead>
+                  <TableHead>DKIM</TableHead>
+                  <TableHead>Created</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {domains.map((domain) => (
+                  <TableRow key={domain.id}>
+                    <TableCell className="font-medium">{domain.domain}</TableCell>
+                    <TableCell>
+                      <code className="text-xs bg-muted px-2 py-1 rounded">
+                        {domain.region}
+                      </code>
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(domain.verificationStatus, domain.verificationStatusText)}
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(domain.dkimStatus, domain.dkimStatusText)}
+                    </TableCell>
+                    <TableCell>
+                      {new Date(domain.createdAtUtc).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell className="text-right space-x-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => navigate(`/domains/${domain.id}`)}
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleVerifyDomain(domain.id)}
+                        disabled={verifyDomain.isPending}
+                      >
+                        <RefreshCw className={`h-4 w-4 ${verifyDomain.isPending ? 'animate-spin' : ''}`} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleDeleteDomain(domain.id, domain.domain)}
+                        disabled={deleteDomain.isPending}
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       ) : (
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <Database className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-semibold mb-2">No domains yet</h3>
-          <p className="text-gray-500 mb-4">
-            Add your first domain to start sending emails
-          </p>
-          <Button onClick={() => setIsAddModalOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Domain
-          </Button>
-        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <Database className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">No domains yet</h3>
+            <p className="text-muted-foreground mb-4">
+              Add your first domain to start sending emails
+            </p>
+            <Button onClick={() => setIsAddModalOpen(true)}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Domain
+            </Button>
+          </CardContent>
+        </Card>
       )}
 
       {/* Add Domain Modal */}
@@ -256,7 +258,6 @@ export function DomainsPage() {
           </DialogHeader>
 
           <form onSubmit={handleSubmit(handleAddDomain)} className="space-y-4 py-4">
-            {/* Informational Alert */}
             {isFirstDomainInRegion(selectedRegion) && (
               <Alert>
                 <Info className="h-4 w-4" />
@@ -273,10 +274,9 @@ export function DomainsPage() {
                 id="domain"
                 placeholder="example.com"
                 {...register('domain')}
-                className={errors.domain ? 'border-red-500' : ''}
               />
               {errors.domain && (
-                <p className="text-sm text-red-600">{errors.domain.message}</p>
+                <p className="text-sm text-destructive">{errors.domain.message}</p>
               )}
             </div>
 
@@ -286,7 +286,7 @@ export function DomainsPage() {
                 value={selectedRegion}
                 onValueChange={(value) => setValue('region', value)}
               >
-                <SelectTrigger className={errors.region ? 'border-red-500' : ''}>
+                <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -297,9 +297,9 @@ export function DomainsPage() {
                 </SelectContent>
               </Select>
               {errors.region && (
-                <p className="text-sm text-red-600">{errors.region.message}</p>
+                <p className="text-sm text-destructive">{errors.region.message}</p>
               )}
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Configuration Sets are automatically created per region for email tracking.
               </p>
             </div>

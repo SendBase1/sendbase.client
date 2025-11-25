@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useDomain, useVerifyDomain } from '../../hooks/useDomains';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
+import { Card, CardContent } from '../../components/ui/card';
 import {
   Table,
   TableBody,
@@ -42,7 +43,7 @@ export function DomainDetailsPage() {
     }
   };
 
-  const getStatusBadge = (status: number, text: string) => {
+  const getStatusBadge = (_status: number, text: string) => {
     const variants: Record<string, any> = {
       Verified: 'default',
       Success: 'default',
@@ -59,27 +60,29 @@ export function DomainDetailsPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="h-8 w-8 animate-spin text-gray-400" />
+        <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
 
   if (!domain) {
     return (
-      <div className="space-y-6">
+      <div className="flex-1 space-y-6 p-8">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={() => navigate('/domains')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Domains
           </Button>
         </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-          <AlertCircle className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Domain not found</h3>
-          <p className="text-gray-500">
-            The domain you're looking for doesn't exist or has been removed.
-          </p>
-        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+            <AlertCircle className="h-12 w-12 text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Domain not found</h3>
+            <p className="text-muted-foreground">
+              The domain you're looking for doesn't exist or has been removed.
+            </p>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -87,7 +90,7 @@ export function DomainDetailsPage() {
   const isVerified = domain.verificationStatus === 1 && domain.dkimStatus === 1;
 
   return (
-    <div className="space-y-6">
+    <div className="flex-1 space-y-6 p-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -97,7 +100,7 @@ export function DomainDetailsPage() {
           </Button>
           <div>
             <h2 className="text-3xl font-bold tracking-tight">{domain.domain}</h2>
-            <p className="text-gray-500 mt-1">
+            <p className="text-muted-foreground mt-1">
               Domain verification and DNS configuration
             </p>
           </div>
@@ -113,42 +116,48 @@ export function DomainDetailsPage() {
 
       {/* Status Overview */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500 mb-1">Domain Verification</p>
-              <div className="flex items-center gap-2">
-                {getStatusBadge(domain.verificationStatus, domain.verificationStatusText)}
-                {domain.verificationStatus === 1 && (
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                )}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Domain Verification</p>
+                <div className="flex items-center gap-2">
+                  {getStatusBadge(domain.verificationStatus, domain.verificationStatusText)}
+                  {domain.verificationStatus === 1 && (
+                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-500 mb-1">DKIM Status</p>
-              <div className="flex items-center gap-2">
-                {getStatusBadge(domain.dkimStatus, domain.dkimStatusText)}
-                {domain.dkimStatus === 1 && (
-                  <CheckCircle2 className="h-4 w-4 text-green-600" />
-                )}
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">DKIM Status</p>
+                <div className="flex items-center gap-2">
+                  {getStatusBadge(domain.dkimStatus, domain.dkimStatusText)}
+                  {domain.dkimStatus === 1 && (
+                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div>
-            <p className="text-sm text-gray-500 mb-1">Region</p>
-            <code className="text-sm bg-gray-100 px-2 py-1 rounded">
-              {domain.region}
-            </code>
-          </div>
-        </div>
+        <Card>
+          <CardContent className="p-6">
+            <div>
+              <p className="text-sm text-muted-foreground mb-1">Region</p>
+              <code className="text-sm bg-muted px-2 py-1 rounded">
+                {domain.region}
+              </code>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Verification Alert */}
@@ -185,15 +194,16 @@ export function DomainDetailsPage() {
       )}
 
       {/* DNS Records Table */}
-      <div className="bg-white rounded-lg border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
-          <h3 className="text-lg font-semibold">DNS Records</h3>
-          <p className="text-sm text-gray-500 mt-1">
-            Add these records to your DNS provider to verify your domain
-          </p>
-        </div>
+      <Card>
+        <CardContent className="p-0">
+          <div className="p-6 border-b">
+            <h3 className="text-lg font-semibold">DNS Records</h3>
+            <p className="text-sm text-muted-foreground mt-1">
+              Add these records to your DNS provider to verify your domain
+            </p>
+          </div>
 
-        <Table>
+          <Table>
           <TableHeader>
             <TableRow>
               <TableHead>Type</TableHead>
@@ -208,13 +218,13 @@ export function DomainDetailsPage() {
               domain.dnsRecords.map((record) => (
                 <TableRow key={record.id}>
                   <TableCell>
-                    <code className="text-xs bg-gray-100 px-2 py-1 rounded font-mono">
+                    <code className="text-xs bg-muted px-2 py-1 rounded font-mono">
                       {record.recordType}
                     </code>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <code className="text-xs bg-gray-50 px-2 py-1 rounded font-mono max-w-xs truncate">
+                      <code className="text-xs bg-muted px-2 py-1 rounded font-mono max-w-xs truncate">
                         {record.host}
                       </code>
                       <Button
@@ -233,7 +243,7 @@ export function DomainDetailsPage() {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-2">
-                      <code className="text-xs bg-gray-50 px-2 py-1 rounded font-mono max-w-md truncate">
+                      <code className="text-xs bg-muted px-2 py-1 rounded font-mono max-w-md truncate">
                         {record.value}
                       </code>
                       <Button
@@ -264,51 +274,54 @@ export function DomainDetailsPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
                   No DNS records found
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
-        </Table>
-      </div>
+          </Table>
+        </CardContent>
+      </Card>
 
       {/* Additional Information */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold mb-4">Additional Information</h3>
-        <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <dt className="text-sm text-gray-500 mb-1">Created</dt>
-            <dd className="text-sm font-medium">
-              {new Date(domain.createdAtUtc).toLocaleString()}
-            </dd>
-          </div>
-          {domain.verifiedAtUtc && (
+      <Card>
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Additional Information</h3>
+          <dl className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <dt className="text-sm text-gray-500 mb-1">Verified</dt>
+              <dt className="text-sm text-muted-foreground mb-1">Created</dt>
               <dd className="text-sm font-medium">
-                {new Date(domain.verifiedAtUtc).toLocaleString()}
+                {new Date(domain.createdAtUtc).toLocaleString()}
               </dd>
             </div>
-          )}
-          {domain.mailFromSubdomain && (
-            <div>
-              <dt className="text-sm text-gray-500 mb-1">Mail From Subdomain</dt>
-              <dd className="text-sm font-medium font-mono">
-                {domain.mailFromSubdomain}
-              </dd>
-            </div>
-          )}
-          {domain.identityArn && (
-            <div className="md:col-span-2">
-              <dt className="text-sm text-gray-500 mb-1">AWS Identity ARN</dt>
-              <dd className="text-xs font-mono bg-gray-50 px-3 py-2 rounded break-all">
-                {domain.identityArn}
-              </dd>
-            </div>
-          )}
-        </dl>
-      </div>
+            {domain.verifiedAtUtc && (
+              <div>
+                <dt className="text-sm text-muted-foreground mb-1">Verified</dt>
+                <dd className="text-sm font-medium">
+                  {new Date(domain.verifiedAtUtc).toLocaleString()}
+                </dd>
+              </div>
+            )}
+            {domain.mailFromSubdomain && (
+              <div>
+                <dt className="text-sm text-muted-foreground mb-1">Mail From Subdomain</dt>
+                <dd className="text-sm font-medium font-mono">
+                  {domain.mailFromSubdomain}
+                </dd>
+              </div>
+            )}
+            {domain.identityArn && (
+              <div className="md:col-span-2">
+                <dt className="text-sm text-muted-foreground mb-1">AWS Identity ARN</dt>
+                <dd className="text-xs font-mono bg-muted px-3 py-2 rounded break-all">
+                  {domain.identityArn}
+                </dd>
+              </div>
+            )}
+          </dl>
+        </CardContent>
+      </Card>
     </div>
   );
 }

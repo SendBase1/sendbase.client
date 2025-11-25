@@ -19,7 +19,7 @@ export function MessageDetailsPage() {
   const navigate = useNavigate();
   const { data: message, isLoading } = useMessage(id!);
 
-  const getStatusBadge = (status: number, text: string) => {
+  const getStatusBadge = (_status: number, text: string) => {
     const variants: Record<string, any> = {
       Sent: 'default',
       Delivered: 'default',
@@ -250,7 +250,7 @@ export function MessageDetailsPage() {
             <div className="space-y-4">
               {message.events
                 .sort((a, b) => new Date(b.occurredAtUtc).getTime() - new Date(a.occurredAtUtc).getTime())
-                .map((event, index) => (
+                .map((event) => (
                   <div key={event.id} className="flex gap-4">
                     <div className={`flex-shrink-0 ${getEventColor(event.eventType)}`}>
                       {getEventIcon(event.eventType)}
