@@ -1,22 +1,40 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import './App.css';
-import Home from './Home';
-import SignIn from './SignIn';
-import Dashboard from './Dashboard';
 import { AppLayout } from './components/Layout/AppLayout';
-import { DomainsPage } from './pages/Domains/DomainsPage';
-import { DomainDetailsPage } from './pages/Domains/DomainDetailsPage';
-import { SendEmailPage } from './pages/SendEmail/SendEmailPage';
-import { MessagesPage } from './pages/Messages/MessagesPage';
-import { MessageDetailsPage } from './pages/Messages/MessageDetailsPage';
-import { ApiKeysPage } from './pages/ApiKeys/ApiKeysPage';
-import { TermsOfService, PrivacyPolicy, AcceptableUsePolicy } from './pages/Legal';
+import { RefreshCw } from 'lucide-react';
+import './App.css';
+
+// Lazy load pages for code splitting
+const Home = lazy(() => import('./Home'));
+const SignIn = lazy(() => import('./SignIn'));
+const Dashboard = lazy(() => import('./Dashboard'));
+const DomainsPage = lazy(() => import('./pages/Domains/DomainsPage').then(m => ({ default: m.DomainsPage })));
+const DomainDetailsPage = lazy(() => import('./pages/Domains/DomainDetailsPage').then(m => ({ default: m.DomainDetailsPage })));
+const SendEmailPage = lazy(() => import('./pages/SendEmail/SendEmailPage').then(m => ({ default: m.SendEmailPage })));
+const MessagesPage = lazy(() => import('./pages/Messages/MessagesPage').then(m => ({ default: m.MessagesPage })));
+const MessageDetailsPage = lazy(() => import('./pages/Messages/MessageDetailsPage').then(m => ({ default: m.MessageDetailsPage })));
+const ApiKeysPage = lazy(() => import('./pages/ApiKeys/ApiKeysPage').then(m => ({ default: m.ApiKeysPage })));
+const ProfilePage = lazy(() => import('./pages/Profile').then(m => ({ default: m.ProfilePage })));
+const WebhooksPage = lazy(() => import('./pages/Webhooks').then(m => ({ default: m.WebhooksPage })));
+const WebhookDetailsPage = lazy(() => import('./pages/Webhooks').then(m => ({ default: m.WebhookDetailsPage })));
+const TermsOfService = lazy(() => import('./pages/Legal').then(m => ({ default: m.TermsOfService })));
+const PrivacyPolicy = lazy(() => import('./pages/Legal').then(m => ({ default: m.PrivacyPolicy })));
+const AcceptableUsePolicy = lazy(() => import('./pages/Legal').then(m => ({ default: m.AcceptableUsePolicy })));
 
 const queryClient = new QueryClient();
+
+// Loading fallback component
+function PageLoader() {
+    return (
+        <div className="flex items-center justify-center h-64">
+            <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+        </div>
+    );
+}
 
 function App() {
     return (
@@ -24,35 +42,40 @@ function App() {
             <ThemeProvider defaultTheme="dark">
                 <BrowserRouter>
                     <AuthProvider>
-                        <Routes>
-                            <Route path="/" element={<Home />} />
-                            <Route path="/login" element={<SignIn />} />
+                        <Suspense fallback={<PageLoader />}>
+                            <Routes>
+                                <Route path="/" element={<Home />} />
+                                <Route path="/login" element={<SignIn />} />
 
-                            {/* Legal pages - publicly accessible */}
-                            <Route path="/terms" element={<TermsOfService />} />
-                            <Route path="/privacy" element={<PrivacyPolicy />} />
-                            <Route path="/acceptable-use" element={<AcceptableUsePolicy />} />
+                                {/* Legal pages - publicly accessible */}
+                                <Route path="/terms" element={<TermsOfService />} />
+                                <Route path="/privacy" element={<PrivacyPolicy />} />
+                                <Route path="/acceptable-use" element={<AcceptableUsePolicy />} />
 
-                            {/* Protected routes with AppLayout */}
-                            <Route
-                                element={
-                                    <ProtectedRoute>
-                                        <AppLayout />
-                                    </ProtectedRoute>
-                                }
-                            >
-                                <Route path="/dashboard" element={<Dashboard />} />
-                                <Route path="/domains" element={<DomainsPage />} />
-                                <Route path="/domains/:id" element={<DomainDetailsPage />} />
-                                <Route path="/send" element={<SendEmailPage />} />
-                                <Route path="/messages" element={<MessagesPage />} />
-                                <Route path="/messages/:id" element={<MessageDetailsPage />} />
-                                <Route path="/apikeys" element={<ApiKeysPage />} />
-                            </Route>
+                                {/* Protected routes with AppLayout */}
+                                <Route
+                                    element={
+                                        <ProtectedRoute>
+                                            <AppLayout />
+                                        </ProtectedRoute>
+                                    }
+                                >
+                                    <Route path="/dashboard" element={<Dashboard />} />
+                                    <Route path="/domains" element={<DomainsPage />} />
+                                    <Route path="/domains/:id" element={<DomainDetailsPage />} />
+                                    <Route path="/send" element={<SendEmailPage />} />
+                                    <Route path="/messages" element={<MessagesPage />} />
+                                    <Route path="/messages/:id" element={<MessageDetailsPage />} />
+                                    <Route path="/apikeys" element={<ApiKeysPage />} />
+                                    <Route path="/webhooks" element={<WebhooksPage />} />
+                                    <Route path="/webhooks/:id" element={<WebhookDetailsPage />} />
+                                    <Route path="/profile" element={<ProfilePage />} />
+                                </Route>
 
-                            {/* Catch-all redirect */}
-                            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                        </Routes>
+                                {/* Catch-all redirect */}
+                                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                            </Routes>
+                        </Suspense>
                     </AuthProvider>
                 </BrowserRouter>
             </ThemeProvider>

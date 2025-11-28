@@ -8,6 +8,13 @@ import type {
   ApiKeyResponse,
   CreateApiKeyRequest,
   ApiKeyScopesResponse,
+  WebhookEndpointResponse,
+  WebhookEndpointCreatedResponse,
+  CreateWebhookEndpointRequest,
+  UpdateWebhookEndpointRequest,
+  WebhookEventType,
+  WebhookDeliveryResponse,
+  WebhookTestResponse,
 } from './types';
 import { API_BASE_URL } from './config';
 import { triggerLogout } from '../contexts/AuthContext';
@@ -146,6 +153,72 @@ export const apiKeyApi = {
   async getScopes(): Promise<ApiKeyScopesResponse> {
     const response = await fetchWithAuth('/api/v1/apikeys/scopes');
     if (!response.ok) throw new Error('Failed to fetch scopes');
+    return response.json();
+  },
+};
+
+// Webhook API
+export const webhookApi = {
+  async getAll(): Promise<WebhookEndpointResponse[]> {
+    const response = await fetchWithAuth('/api/v1/webhook-endpoints');
+    if (!response.ok) throw new Error('Failed to fetch webhooks');
+    return response.json();
+  },
+
+  async getById(id: string): Promise<WebhookEndpointResponse> {
+    const response = await fetchWithAuth(`/api/v1/webhook-endpoints/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch webhook');
+    return response.json();
+  },
+
+  async create(data: CreateWebhookEndpointRequest): Promise<WebhookEndpointCreatedResponse> {
+    const response = await fetchWithAuth('/api/v1/webhook-endpoints', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create webhook');
+    }
+    return response.json();
+  },
+
+  async update(id: string, data: UpdateWebhookEndpointRequest): Promise<WebhookEndpointResponse> {
+    const response = await fetchWithAuth(`/api/v1/webhook-endpoints/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to update webhook');
+    }
+    return response.json();
+  },
+
+  async delete(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/webhook-endpoints/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete webhook');
+  },
+
+  async test(id: string): Promise<WebhookTestResponse> {
+    const response = await fetchWithAuth(`/api/v1/webhook-endpoints/${id}/test`, {
+      method: 'POST',
+    });
+    if (!response.ok) throw new Error('Failed to test webhook');
+    return response.json();
+  },
+
+  async getDeliveries(id: string, limit: number = 50): Promise<WebhookDeliveryResponse[]> {
+    const response = await fetchWithAuth(`/api/v1/webhook-endpoints/${id}/deliveries?limit=${limit}`);
+    if (!response.ok) throw new Error('Failed to fetch deliveries');
+    return response.json();
+  },
+
+  async getEventTypes(): Promise<WebhookEventType[]> {
+    const response = await fetchWithAuth('/api/v1/webhook-endpoints/event-types');
+    if (!response.ok) throw new Error('Failed to fetch event types');
     return response.json();
   },
 };

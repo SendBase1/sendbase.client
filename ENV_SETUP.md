@@ -31,7 +31,7 @@ This project uses environment variables to configure the API base URL for differ
 
 4. Add the following secret:
    - **Name**: `VITE_API_BASE_URL`
-   - **Value**: `https://emailapibackend-bvdba8b2grbsbxae.westus3-01.azurewebsites.net`
+   - **Value**: `https://api.socialhq.app`
 
 5. Click **"Add secret"**
 

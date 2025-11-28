@@ -139,3 +139,55 @@ export interface ApiKeyScopesResponse {
   scopes: ApiKeyScope[];
   presets: ApiKeyPreset[];
 }
+
+// Webhook Types
+
+export interface WebhookEndpointResponse {
+  id: string;
+  name: string;
+  url: string;
+  event_types: string[];
+  enabled: boolean;
+  secret_preview: string;
+  created_at_utc: string;
+}
+
+export interface WebhookEndpointCreatedResponse {
+  endpoint: WebhookEndpointResponse;
+  secret: string;
+}
+
+export interface CreateWebhookEndpointRequest {
+  name: string;
+  url: string;
+  event_types: string[];
+}
+
+export interface UpdateWebhookEndpointRequest {
+  name?: string;
+  url?: string;
+  event_types?: string[];
+  enabled?: boolean;
+}
+
+export interface WebhookEventType {
+  name: string;
+  description: string;
+}
+
+export interface WebhookDeliveryResponse {
+  id: number;
+  event_type: string;
+  status: number;
+  status_text: string;
+  attempt_count: number;
+  last_attempt_utc?: string;
+  response_status_code?: number;
+  next_retry_at_utc?: string;
+}
+
+export interface WebhookTestResponse {
+  success: boolean;
+  message: string;
+  status_code?: number;
+}

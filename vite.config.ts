@@ -53,6 +53,22 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
     },
+    build: {
+        chunkSizeWarningLimit: 700, // Syntax highlighter is ~637KB, isolated to landing page only
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    // Vendor chunks - split large dependencies
+                    'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+                    'vendor-ui': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-select', '@radix-ui/react-tabs', '@radix-ui/react-tooltip', '@radix-ui/react-switch', '@radix-ui/react-separator', '@radix-ui/react-label', '@radix-ui/react-slot'],
+                    'vendor-query': ['@tanstack/react-query'],
+                    'vendor-forms': ['react-hook-form', '@hookform/resolvers', 'zod'],
+                    'vendor-utils': ['clsx', 'tailwind-merge', 'class-variance-authority', 'date-fns', 'lucide-react'],
+                    'vendor-syntax': ['react-syntax-highlighter'],
+                }
+            }
+        }
+    },
     server: isDevelopment ? {
         proxy: {
             '^/weatherforecast': {

@@ -9,10 +9,11 @@ import {
   MessageSquare,
   LayoutDashboard,
   LogOut,
-  Settings,
   Moon,
   Sun,
   Key,
+  User,
+  Webhook,
 } from 'lucide-react';
 
 export function AppLayout() {
@@ -28,7 +29,7 @@ export function AppLayout() {
     { path: '/send', label: 'Send', icon: Send },
     { path: '/messages', label: 'Messages', icon: MessageSquare },
     { path: '/apikeys', label: 'API Keys', icon: Key },
-    { path: '/settings', label: 'Settings', icon: Settings },
+    { path: '/webhooks', label: 'Webhooks', icon: Webhook },
   ];
 
   return (
@@ -80,6 +81,19 @@ export function AppLayout() {
                 {theme === 'dark' ? <Sun className="mr-2 h-4 w-4" /> : <Moon className="mr-2 h-4 w-4" />}
                 {theme === 'dark' ? 'Light' : 'Dark'} mode
               </Button>
+              <Link
+                to="/profile"
+                className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all hover:text-primary ${
+                  isActive('/profile')
+                    ? 'bg-muted text-primary'
+                    : 'text-muted-foreground'
+                }`}
+              >
+                <User className="h-4 w-4" />
+                <div className="flex-1 truncate">
+                  <span className="block text-xs font-medium truncate">{userEmail || 'Profile'}</span>
+                </div>
+              </Link>
               <Button
                 variant="ghost"
                 size="sm"
@@ -89,11 +103,6 @@ export function AppLayout() {
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
               </Button>
-              {userEmail && (
-                <p className="px-3 text-xs text-muted-foreground truncate">
-                  {userEmail}
-                </p>
-              )}
             </div>
           </div>
         </div>
