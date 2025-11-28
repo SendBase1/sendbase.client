@@ -33,16 +33,17 @@ export function MessagesPage() {
   const { data: messagesData, isLoading, refetch } = useMessages(page, pageSize);
 
   const getStatusBadge = (_status: number, text: string) => {
-    const variants: Record<string, any> = {
-      Sent: 'default',
-      Delivered: 'default',
-      Pending: 'secondary',
-      Failed: 'destructive',
-      Bounced: 'destructive',
-      Complained: 'destructive',
+    const styles: Record<string, string> = {
+      Sent: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/20',
+      Delivered: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/20',
+      Pending: 'bg-yellow-500/15 text-yellow-500 border-yellow-500/20',
+      Queued: 'bg-blue-500/15 text-blue-500 border-blue-500/20',
+      Failed: 'bg-red-500/15 text-red-400 border-red-500/20',
+      Bounced: 'bg-orange-500/15 text-orange-400 border-orange-500/20',
+      Complained: 'bg-red-500/15 text-red-400 border-red-500/20',
     };
     return (
-      <Badge variant={variants[text] || 'secondary'}>
+      <Badge variant="outline" className={styles[text] || 'bg-muted text-muted-foreground'}>
         {text}
       </Badge>
     );
@@ -50,16 +51,16 @@ export function MessagesPage() {
 
   const filteredMessages = messagesData?.items?.filter((message) => {
     const matchesSearch = searchTerm === '' ||
-      message.fromEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      message.from_email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       message.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       message.recipients.some(r => r.email.toLowerCase().includes(searchTerm.toLowerCase()));
 
-    const matchesStatus = statusFilter === 'all' || message.statusText === statusFilter;
+    const matchesStatus = statusFilter === 'all' || message.status_text === statusFilter;
 
     return matchesSearch && matchesStatus;
   }) || [];
 
-  const totalPages = messagesData ? Math.ceil(messagesData.totalCount / pageSize) : 1;
+  const totalPages = messagesData ? Math.ceil(messagesData.total_count / pageSize) : 1;
   const hasNextPage = page < totalPages;
   const hasPrevPage = page > 1;
 
@@ -142,9 +143,9 @@ export function MessagesPage() {
                     <TableRow key={message.id}>
                       <TableCell>
                         <div>
-                          <div className="font-medium">{message.fromEmail}</div>
-                          {message.fromName && (
-                            <div className="text-xs text-muted-foreground">{message.fromName}</div>
+                          <div className="font-medium">{message.from_email}</div>
+                          {message.from_name && (
+                            <div className="text-xs text-muted-foreground">{message.from_name}</div>
                           )}
                         </div>
                       </TableCell>
@@ -158,9 +159,9 @@ export function MessagesPage() {
                           {message.recipients.slice(0, 2).map((recipient, idx) => (
                             <div key={idx} className="text-sm">
                               {recipient.email}
-                              {recipient.deliveryStatus !== 0 && (
+                              {recipient.delivery_status !== 0 && (
                                 <span className="ml-2">
-                                  {getStatusBadge(recipient.deliveryStatus, recipient.deliveryStatusText)}
+                                  {getStatusBadge(recipient.delivery_status, recipient.delivery_status_text)}
                                 </span>
                               )}
                             </div>
@@ -173,15 +174,15 @@ export function MessagesPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {getStatusBadge(message.status, message.statusText)}
+                        {getStatusBadge(message.status, message.status_text)}
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          {message.sentAtUtc ? (
+                          {message.sent_at_utc ? (
                             <>
-                              <div>{formatDistanceToNow(new Date(message.sentAtUtc), { addSuffix: true })}</div>
+                              <div>{formatDistanceToNow(new Date(message.sent_at_utc), { addSuffix: true })}</div>
                               <div className="text-xs text-muted-foreground">
-                                {new Date(message.sentAtUtc).toLocaleDateString()}
+                                {new Date(message.sent_at_utc).toLocaleDateString()}
                               </div>
                             </>
                           ) : (
@@ -210,7 +211,7 @@ export function MessagesPage() {
             <CardContent className="flex items-center justify-between p-4">
               <div className="flex items-center gap-4">
                 <div className="text-sm text-muted-foreground">
-                  Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, messagesData?.totalCount || 0)} of {messagesData?.totalCount || 0} messages
+                  Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, messagesData?.total_count || 0)} of {messagesData?.total_count || 0} messages
                 </div>
                 <Select value={pageSize.toString()} onValueChange={(val) => {
                   setPageSize(Number(val));

@@ -31,25 +31,27 @@ function Dashboard() {
     const { data: messagesData, isLoading: messagesLoading } = useMessages(1, 5);
 
     // Calculate stats
-    const verifiedDomains = domains?.filter(d => d.verificationStatus === 1 && d.dkimStatus === 1).length || 0;
+    const verifiedDomains = domains?.filter(d => d.verification_status === 1 && d.dkim_status === 1).length || 0;
     const totalDomains = domains?.length || 0;
     const recentMessages = messagesData?.items || [];
-    const totalMessages = messagesData?.totalCount || 0;
+    const totalMessages = messagesData?.total_count || 0;
 
     // Calculate message stats
     const sentMessages = recentMessages.filter(m => m.status === 1).length;
     const failedMessages = recentMessages.filter(m => m.status === 2 || m.status === 3).length;
 
     const getStatusBadge = (_status: number, text: string) => {
-        const variants: Record<string, any> = {
-            Sent: 'default',
-            Delivered: 'default',
-            Pending: 'secondary',
-            Failed: 'destructive',
-            Bounced: 'destructive',
+        const styles: Record<string, string> = {
+            Sent: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/20',
+            Delivered: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/20',
+            Pending: 'bg-yellow-500/15 text-yellow-500 border-yellow-500/20',
+            Queued: 'bg-blue-500/15 text-blue-500 border-blue-500/20',
+            Failed: 'bg-red-500/15 text-red-400 border-red-500/20',
+            Bounced: 'bg-orange-500/15 text-orange-400 border-orange-500/20',
+            Complained: 'bg-red-500/15 text-red-400 border-red-500/20',
         };
         return (
-            <Badge variant={variants[text] || 'secondary'} className="text-xs">
+            <Badge variant="outline" className={`text-xs ${styles[text] || 'bg-muted text-muted-foreground'}`}>
                 {text}
             </Badge>
         );
@@ -260,17 +262,17 @@ function Dashboard() {
                                         onClick={() => navigate(`/messages/${message.id}`)}
                                     >
                                         <TableCell className="font-medium text-sm">
-                                            {message.fromEmail}
+                                            {message.from_email}
                                         </TableCell>
                                         <TableCell className="max-w-xs truncate text-sm">
                                             {message.subject || <span className="text-muted-foreground italic">No subject</span>}
                                         </TableCell>
                                         <TableCell>
-                                            {getStatusBadge(message.status, message.statusText)}
+                                            {getStatusBadge(message.status, message.status_text)}
                                         </TableCell>
                                         <TableCell className="text-xs text-muted-foreground">
-                                            {message.sentAtUtc
-                                                ? formatDistanceToNow(new Date(message.sentAtUtc), { addSuffix: true })
+                                            {message.sent_at_utc
+                                                ? formatDistanceToNow(new Date(message.sent_at_utc), { addSuffix: true })
                                                 : 'Not sent'}
                                         </TableCell>
                                     </TableRow>

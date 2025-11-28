@@ -465,19 +465,19 @@ client.send(
                             <h3 className="mb-4 text-sm font-semibold">Legal</h3>
                             <ul className="space-y-3 text-sm">
                                 <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                                        Privacy
-                                    </a>
+                                    <Link to="/privacy" className="text-muted-foreground hover:text-foreground transition-colors">
+                                        Privacy Policy
+                                    </Link>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                                        Terms
-                                    </a>
+                                    <Link to="/terms" className="text-muted-foreground hover:text-foreground transition-colors">
+                                        Terms of Service
+                                    </Link>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                                        Security
-                                    </a>
+                                    <Link to="/acceptable-use" className="text-muted-foreground hover:text-foreground transition-colors">
+                                        Acceptable Use
+                                    </Link>
                                 </li>
                             </ul>
                         </div>

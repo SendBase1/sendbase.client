@@ -1,6 +1,7 @@
-import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { useTheme } from '../theme-provider';
+import { useAuth } from '../../contexts/AuthContext';
 import {
   Mail,
   Send,
@@ -11,17 +12,13 @@ import {
   Settings,
   Moon,
   Sun,
+  Key,
 } from 'lucide-react';
 
 export function AppLayout() {
   const location = useLocation();
-  const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
-
-  const handleLogout = () => {
-    localStorage.removeItem('authToken');
-    navigate('/login');
-  };
+  const { logout, userEmail } = useAuth();
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
 
@@ -30,14 +27,15 @@ export function AppLayout() {
     { path: '/domains', label: 'Domains', icon: Database },
     { path: '/send', label: 'Send', icon: Send },
     { path: '/messages', label: 'Messages', icon: MessageSquare },
+    { path: '/apikeys', label: 'API Keys', icon: Key },
     { path: '/settings', label: 'Settings', icon: Settings },
   ];
 
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
-      <aside className="w-64 border-r bg-muted/40">
-        <div className="flex h-full max-h-screen flex-col gap-2">
+      <aside className="fixed inset-y-0 left-0 z-50 w-64 border-r bg-muted/40">
+        <div className="flex h-full flex-col gap-2">
           {/* Logo */}
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link to="/dashboard" className="flex items-center gap-2 font-semibold">
@@ -85,19 +83,24 @@ export function AppLayout() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={handleLogout}
+                onClick={logout}
                 className="justify-start text-muted-foreground"
               >
                 <LogOut className="mr-2 h-4 w-4" />
                 Logout
               </Button>
+              {userEmail && (
+                <p className="px-3 text-xs text-muted-foreground truncate">
+                  {userEmail}
+                </p>
+              )}
             </div>
           </div>
         </div>
       </aside>
 
       {/* Main Content */}
-      <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1 ml-64">
         <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>

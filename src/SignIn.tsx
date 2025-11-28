@@ -1,12 +1,14 @@
-import { useState, type FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect, type FormEvent } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Mail, ArrowLeft } from 'lucide-react';
 import { config } from '@/lib/config';
+import { useAuth } from './contexts/AuthContext';
 
 interface AuthResponse {
     token: string;
@@ -22,6 +24,8 @@ interface ErrorResponse {
 
 function SignIn() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { login, isAuthenticated } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -29,6 +33,17 @@ function SignIn() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState<string | null>(null);
+    const [acceptedTerms, setAcceptedTerms] = useState(false);
+
+    // Get the page they tried to visit before being redirected to login
+    const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
+
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate(from, { replace: true });
+        }
+    }, [isAuthenticated, navigate, from]);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -55,14 +70,13 @@ function SignIn() {
             if (response.ok) {
                 const data: AuthResponse = await response.json();
 
-                localStorage.setItem('authToken', data.token);
-                localStorage.setItem('userEmail', data.email);
-                localStorage.setItem('userId', data.userId);
+                // Use AuthContext login function
+                login(data.token, data.email, data.userId);
 
                 setSuccess(isRegistering ? 'Registration successful!' : 'Login successful!');
 
                 setTimeout(() => {
-                    navigate('/dashboard');
+                    navigate(from, { replace: true });
                 }, 500);
             } else {
                 const errorData: ErrorResponse = await response.json();
@@ -84,7 +98,7 @@ function SignIn() {
         <div className="min-h-screen flex flex-col">
             {/* Header */}
             <header className="border-b">
-                <div className="container flex h-14 items-center">
+                <div className="container mx-auto flex h-14 max-w-7xl items-center px-4 md:px-6">
                     <Link to="/" className="flex items-center space-x-2">
                         <Mail className="h-6 w-6" />
                         <span className="font-bold">EmailAPI</span>
@@ -167,6 +181,46 @@ function SignIn() {
                                 </div>
                             )}
 
+                            {isRegistering && (
+                                <div className="flex items-start space-x-2">
+                                    <Checkbox
+                                        id="terms"
+                                        checked={acceptedTerms}
+                                        onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+                                        disabled={loading}
+                                    />
+                                    <label
+                                        htmlFor="terms"
+                                        className="text-sm leading-tight cursor-pointer"
+                                    >
+                                        I agree to the{' '}
+                                        <Link
+                                            to="/terms"
+                                            target="_blank"
+                                            className="text-primary underline underline-offset-4 hover:text-primary/80"
+                                        >
+                                            Terms of Service
+                                        </Link>
+                                        ,{' '}
+                                        <Link
+                                            to="/privacy"
+                                            target="_blank"
+                                            className="text-primary underline underline-offset-4 hover:text-primary/80"
+                                        >
+                                            Privacy Policy
+                                        </Link>
+                                        , and{' '}
+                                        <Link
+                                            to="/acceptable-use"
+                                            target="_blank"
+                                            className="text-primary underline underline-offset-4 hover:text-primary/80"
+                                        >
+                                            Acceptable Use Policy
+                                        </Link>
+                                    </label>
+                                </div>
+                            )}
+
                             {error && (
                                 <Alert variant="destructive">
                                     <AlertDescription>{error}</AlertDescription>
@@ -182,7 +236,7 @@ function SignIn() {
                             <Button
                                 type="submit"
                                 className="w-full"
-                                disabled={loading}
+                                disabled={loading || (isRegistering && !acceptedTerms)}
                             >
                                 {loading ? 'Processing...' : (isRegistering ? 'Create Account' : 'Sign In')}
                             </Button>
@@ -199,6 +253,7 @@ function SignIn() {
                                             setError(null);
                                             setSuccess(null);
                                             setConfirmPassword('');
+                                            setAcceptedTerms(false);
                                         }}
                                         className="underline underline-offset-4 hover:text-primary"
                                     >

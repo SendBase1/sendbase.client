@@ -4,39 +4,39 @@ export interface DomainResponse {
   id: string;
   domain: string;
   region: string;
-  verificationStatus: number;
-  verificationStatusText: string;
-  dkimStatus: number;
-  dkimStatusText: string;
-  mailFromStatus: number;
-  mailFromSubdomain?: string;
-  identityArn?: string;
-  createdAtUtc: string;
-  verifiedAtUtc?: string;
-  dnsRecords: DnsRecordResponse[];
+  verification_status: number;
+  verification_status_text: string;
+  dkim_status: number;
+  dkim_status_text: string;
+  mail_from_status: number;
+  mail_from_subdomain?: string;
+  identity_arn?: string;
+  created_at_utc: string;
+  verified_at_utc?: string;
+  dns_records: DnsRecordResponse[];
 }
 
 export interface DnsRecordResponse {
   id: number;
-  recordType: string;
+  record_type: string;
   host: string;
   value: string;
   required: boolean;
-  lastCheckedUtc?: string;
+  last_checked_utc?: string;
   status: number;
-  statusText: string;
+  status_text: string;
 }
 
 export interface MessageResponse {
   id: string;
-  fromEmail: string;
-  fromName?: string;
+  from_email: string;
+  from_name?: string;
   subject?: string;
-  sesMessageId?: string;
+  ses_message_id?: string;
   status: number;
-  statusText: string;
-  requestedAtUtc: string;
-  sentAtUtc?: string;
+  status_text: string;
+  requested_at_utc: string;
+  sent_at_utc?: string;
   error?: string;
   recipients: MessageRecipientResponse[];
   events: MessageEventResponse[];
@@ -46,27 +46,28 @@ export interface MessageResponse {
 export interface MessageRecipientResponse {
   id: number;
   kind: number;
-  kindText: string;
+  kind_text: string;
   email: string;
   name?: string;
-  deliveryStatus: number;
-  deliveryStatusText: string;
-  sesDeliveryId?: string;
+  delivery_status: number;
+  delivery_status_text: string;
+  ses_delivery_id?: string;
 }
 
 export interface MessageEventResponse {
   id: number;
-  eventType: string;
-  occurredAtUtc: string;
+  event_type: string;
+  occurred_at_utc: string;
   recipient?: string;
 }
 
 export interface SendEmailResponse {
-  messageId: string;
-  sesMessageId?: string;
+  message_id: string;
+  ses_message_id?: string;
   status: number;
-  statusText: string;
-  requestedAtUtc: string;
+  status_text: string;
+  requested_at_utc: string;
+  scheduled_at_utc?: string;
   error?: string;
 }
 
@@ -83,22 +84,58 @@ export interface EmailRecipient {
 }
 
 export interface SendEmailRequest {
-  fromEmail: string;
-  fromName?: string;
+  from_email: string;
+  from_name?: string;
   to: EmailRecipient[];
   cc?: EmailRecipient[];
   bcc?: EmailRecipient[];
   subject: string;
-  htmlBody?: string;
-  textBody?: string;
+  html_body?: string;
+  text_body?: string;
   tags?: Record<string, string>;
-  configSetId?: string;
-  templateId?: string;
 }
 
 export interface PaginatedResponse<T> {
   items: T[];
-  totalCount: number;
+  total_count: number;
   page: number;
-  pageSize: number;
+  page_size: number;
+}
+
+// API Key Types
+
+export interface ApiKeyResponse {
+  id: string;
+  name: string;
+  key?: string;  // Only present on create response
+  key_preview: string;
+  scopes: string[];
+  domain_id: string;
+  domain_name: string;
+  created_at_utc: string;
+  last_used_at_utc: string | null;
+  is_revoked?: boolean;
+}
+
+export interface CreateApiKeyRequest {
+  name: string;
+  domain_id: string;
+  scopes: string[];
+}
+
+export interface ApiKeyScope {
+  name: string;
+  description: string;
+}
+
+export interface ApiKeyPreset {
+  name: string;
+  label: string;
+  description: string;
+  scopes: string[];
+}
+
+export interface ApiKeyScopesResponse {
+  scopes: ApiKeyScope[];
+  presets: ApiKeyPreset[];
 }

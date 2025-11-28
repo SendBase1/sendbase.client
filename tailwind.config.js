@@ -15,6 +15,40 @@ export default {
     },
     extend: {
       colors: {
+        // shadcn/ui semantic colors
+        border: "hsl(var(--color-border))",
+        input: "hsl(var(--color-input))",
+        ring: "hsl(var(--color-ring))",
+        background: "hsl(var(--color-background))",
+        foreground: "hsl(var(--color-foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--color-primary))",
+          foreground: "hsl(var(--color-primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--color-secondary))",
+          foreground: "hsl(var(--color-secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--color-destructive))",
+          foreground: "hsl(var(--color-destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--color-muted))",
+          foreground: "hsl(var(--color-muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--color-accent))",
+          foreground: "hsl(var(--color-accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--color-popover))",
+          foreground: "hsl(var(--color-popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--color-card))",
+          foreground: "hsl(var(--color-card-foreground))",
+        },
         // Resend-inspired color palette
         slate: {
           1: 'hsl(0, 0%, 8%)',
@@ -40,6 +74,9 @@ export default {
         25: '25px',
       },
       borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
         '2xl': '1rem',
         '3xl': '1.5rem',
       },

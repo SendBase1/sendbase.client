@@ -28,14 +28,14 @@ const recipientSchema = z.object({
 });
 
 const sendEmailSchema = z.object({
-  fromEmail: z.string().email('Invalid email address'),
-  fromName: z.string().optional(),
+  from_email: z.string().email('Invalid email address'),
+  from_name: z.string().optional(),
   to: z.array(recipientSchema).min(1, 'At least one recipient is required'),
   cc: z.array(recipientSchema).optional(),
   bcc: z.array(recipientSchema).optional(),
   subject: z.string().min(1, 'Subject is required'),
-  htmlBody: z.string().optional(),
-  textBody: z.string().optional(),
+  html_body: z.string().optional(),
+  text_body: z.string().optional(),
 });
 
 type SendEmailFormData = z.infer<typeof sendEmailSchema>;
@@ -77,17 +77,17 @@ export function SendEmailPage() {
     name: 'bcc',
   });
 
-  const verifiedDomains = domains?.filter(d => d.verificationStatus === 1 && d.dkimStatus === 1) || [];
+  const verifiedDomains = domains?.filter(d => d.verification_status === 1 && d.dkim_status === 1) || [];
 
   const handleDomainChange = (domain: string) => {
     setSelectedDomain(domain);
-    const fromName = watch('fromName') || 'noreply';
-    setValue('fromEmail', `${fromName}@${domain}`);
+    const fromName = watch('from_name') || 'noreply';
+    setValue('from_email', `${fromName}@${domain}`);
   };
 
   const handleFromNameChange = (name: string) => {
     if (selectedDomain) {
-      setValue('fromEmail', `${name || 'noreply'}@${selectedDomain}`);
+      setValue('from_email', `${name || 'noreply'}@${selectedDomain}`);
     }
   };
 
@@ -101,15 +101,15 @@ export function SendEmailPage() {
       };
 
       const result = await sendEmail.mutateAsync(cleanedData);
-      toast.success(`Email sent successfully! Message ID: ${result.messageId}`);
+      toast.success(`Email sent successfully! Message ID: ${result.message_id}`);
 
       reset({
         to: [{ email: '', name: '' }],
         cc: [],
         bcc: [],
         subject: '',
-        htmlBody: '',
-        textBody: '',
+        html_body: '',
+        text_body: '',
       });
       setSelectedDomain('');
     } catch (error: any) {
@@ -170,27 +170,27 @@ export function SendEmailPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="fromName">From Name</Label>
+                <Label htmlFor="from_name">From Name</Label>
                 <Input
-                  id="fromName"
+                  id="from_name"
                   placeholder="e.g., noreply, support, hello"
-                  {...register('fromName')}
+                  {...register('from_name')}
                   onChange={(e) => handleFromNameChange(e.target.value)}
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="fromEmail">From Email *</Label>
+              <Label htmlFor="from_email">From Email *</Label>
               <Input
-                id="fromEmail"
+                id="from_email"
                 placeholder="noreply@example.com"
-                {...register('fromEmail')}
+                {...register('from_email')}
                 disabled
                 className="bg-muted"
               />
-              {errors.fromEmail && (
-                <p className="text-sm text-destructive">{errors.fromEmail.message}</p>
+              {errors.from_email && (
+                <p className="text-sm text-destructive">{errors.from_email.message}</p>
               )}
             </div>
           </CardContent>
@@ -358,10 +358,10 @@ export function SendEmailPage() {
 
               <TabsContent value="html" className="space-y-2">
                 <Textarea
-                  id="htmlBody"
+                  id="html_body"
                   placeholder="<html><body><h1>Hello!</h1><p>Your message here...</p></body></html>"
                   rows={12}
-                  {...register('htmlBody')}
+                  {...register('html_body')}
                   className="font-mono text-sm"
                 />
                 <p className="text-xs text-muted-foreground">
@@ -371,10 +371,10 @@ export function SendEmailPage() {
 
               <TabsContent value="text" className="space-y-2">
                 <Textarea
-                  id="textBody"
+                  id="text_body"
                   placeholder="Enter plain text message here..."
                   rows={12}
-                  {...register('textBody')}
+                  {...register('text_body')}
                 />
                 <p className="text-xs text-muted-foreground">
                   Fallback text for email clients that don't support HTML

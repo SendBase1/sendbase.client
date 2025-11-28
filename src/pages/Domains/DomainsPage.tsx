@@ -35,6 +35,8 @@ import {
 import { Alert, AlertDescription } from '../../components/ui/alert';
 import { Plus, RefreshCw, Trash2, ExternalLink, Database, Loader2, Info } from 'lucide-react';
 import { toast } from 'sonner';
+import { ConfirmDialog } from '../../components/ui/confirm-dialog';
+import type { DomainResponse } from '../../lib/types';
 
 const domainSchema = z.object({
   domain: z.string()
@@ -56,6 +58,7 @@ export function DomainsPage() {
   const verifyDomain = useVerifyDomain();
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [domainToDelete, setDomainToDelete] = useState<DomainResponse | null>(null);
 
   const {
     register,
@@ -118,12 +121,13 @@ export function DomainsPage() {
     }
   };
 
-  const handleDeleteDomain = async (id: string, domain: string) => {
-    if (!confirm(`Are you sure you want to delete ${domain}?`)) return;
+  const handleDeleteDomain = async () => {
+    if (!domainToDelete) return;
 
     try {
-      await deleteDomain.mutateAsync(id);
+      await deleteDomain.mutateAsync(domainToDelete.id);
       toast.success('Domain deleted successfully');
+      setDomainToDelete(null);
     } catch (error: any) {
       toast.error(error.message || 'Failed to delete domain');
     }
@@ -192,13 +196,13 @@ export function DomainsPage() {
                       </code>
                     </TableCell>
                     <TableCell>
-                      {getStatusBadge(domain.verificationStatus, domain.verificationStatusText)}
+                      {getStatusBadge(domain.verification_status, domain.verification_status_text)}
                     </TableCell>
                     <TableCell>
-                      {getStatusBadge(domain.dkimStatus, domain.dkimStatusText)}
+                      {getStatusBadge(domain.dkim_status, domain.dkim_status_text)}
                     </TableCell>
                     <TableCell>
-                      {new Date(domain.createdAtUtc).toLocaleDateString()}
+                      {new Date(domain.created_at_utc).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="text-right space-x-2">
                       <Button
@@ -219,7 +223,7 @@ export function DomainsPage() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleDeleteDomain(domain.id, domain.domain)}
+                        onClick={() => setDomainToDelete(domain)}
                         disabled={deleteDomain.isPending}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
@@ -335,6 +339,19 @@ export function DomainsPage() {
           </form>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <ConfirmDialog
+        open={domainToDelete !== null}
+        onOpenChange={(open) => !open && setDomainToDelete(null)}
+        title="Delete Domain"
+        description={`This will permanently delete the domain and remove it from AWS SES. This action cannot be undone.`}
+        confirmText={domainToDelete?.domain ?? ''}
+        confirmLabel="Type the domain name to confirm"
+        onConfirm={handleDeleteDomain}
+        isLoading={deleteDomain.isPending}
+        variant="danger"
+      />
     </div>
   );
 }

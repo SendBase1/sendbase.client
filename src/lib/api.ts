@@ -5,8 +5,12 @@ import type {
   CreateDomainRequest,
   SendEmailRequest,
   PaginatedResponse,
+  ApiKeyResponse,
+  CreateApiKeyRequest,
+  ApiKeyScopesResponse,
 } from './types';
 import { API_BASE_URL } from './config';
+import { triggerLogout } from '../contexts/AuthContext';
 
 // Re-export for backward compatibility
 export { API_BASE_URL };
@@ -20,10 +24,18 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
     ...options.headers,
   };
 
-  return fetch(`${API_BASE_URL}${url}`, {
+  const response = await fetch(`${API_BASE_URL}${url}`, {
     ...options,
     headers,
   });
+
+  // Handle 401 Unauthorized - trigger logout
+  if (response.status === 401) {
+    triggerLogout();
+    throw new Error('Session expired. Please log in again.');
+  }
+
+  return response;
 }
 
 // Domain API
@@ -88,18 +100,52 @@ export const messageApi = {
     const items = await response.json();
 
     // Since backend doesn't return pagination metadata, we create it here
-    // In a real scenario, you'd want the backend to return totalCount
+    // In a real scenario, you'd want the backend to return total_count
     return {
       items,
-      totalCount: items.length, // This is a simplification - backend should return actual total
+      total_count: items.length, // This is a simplification - backend should return actual total
       page,
-      pageSize,
+      page_size: pageSize,
     };
   },
 
   async getById(id: string): Promise<MessageResponse> {
     const response = await fetchWithAuth(`/api/v1/messages/${id}`);
     if (!response.ok) throw new Error('Failed to fetch message');
+    return response.json();
+  },
+};
+
+// API Key API
+export const apiKeyApi = {
+  async getAll(): Promise<ApiKeyResponse[]> {
+    const response = await fetchWithAuth('/api/v1/apikeys');
+    if (!response.ok) throw new Error('Failed to fetch API keys');
+    return response.json();
+  },
+
+  async create(data: CreateApiKeyRequest): Promise<ApiKeyResponse> {
+    const response = await fetchWithAuth('/api/v1/apikeys', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create API key');
+    }
+    return response.json();
+  },
+
+  async revoke(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/apikeys/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to revoke API key');
+  },
+
+  async getScopes(): Promise<ApiKeyScopesResponse> {
+    const response = await fetchWithAuth('/api/v1/apikeys/scopes');
+    if (!response.ok) throw new Error('Failed to fetch scopes');
     return response.json();
   },
 };

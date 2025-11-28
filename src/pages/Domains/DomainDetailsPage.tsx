@@ -87,7 +87,7 @@ export function DomainDetailsPage() {
     );
   }
 
-  const isVerified = domain.verificationStatus === 1 && domain.dkimStatus === 1;
+  const isVerified = domain.verification_status === 1 && domain.dkim_status === 1;
 
   return (
     <div className="flex-1 space-y-6 p-8">
@@ -122,8 +122,8 @@ export function DomainDetailsPage() {
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Domain Verification</p>
                 <div className="flex items-center gap-2">
-                  {getStatusBadge(domain.verificationStatus, domain.verificationStatusText)}
-                  {domain.verificationStatus === 1 && (
+                  {getStatusBadge(domain.verification_status, domain.verification_status_text)}
+                  {domain.verification_status === 1 && (
                     <CheckCircle2 className="h-4 w-4 text-green-600" />
                   )}
                 </div>
@@ -138,8 +138,8 @@ export function DomainDetailsPage() {
               <div>
                 <p className="text-sm text-muted-foreground mb-1">DKIM Status</p>
                 <div className="flex items-center gap-2">
-                  {getStatusBadge(domain.dkimStatus, domain.dkimStatusText)}
-                  {domain.dkimStatus === 1 && (
+                  {getStatusBadge(domain.dkim_status, domain.dkim_status_text)}
+                  {domain.dkim_status === 1 && (
                     <CheckCircle2 className="h-4 w-4 text-green-600" />
                   )}
                 </div>
@@ -214,12 +214,12 @@ export function DomainDetailsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {domain.dnsRecords && domain.dnsRecords.length > 0 ? (
-              domain.dnsRecords.map((record) => (
+            {domain.dns_records && domain.dns_records.length > 0 ? (
+              domain.dns_records.map((record) => (
                 <TableRow key={record.id}>
                   <TableCell>
                     <code className="text-xs bg-muted px-2 py-1 rounded font-mono">
-                      {record.recordType}
+                      {record.record_type}
                     </code>
                   </TableCell>
                   <TableCell>
@@ -261,7 +261,7 @@ export function DomainDetailsPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {getStatusBadge(record.status, record.statusText)}
+                    {getStatusBadge(record.status, record.status_text)}
                   </TableCell>
                   <TableCell className="text-right">
                     {record.required && (
@@ -292,30 +292,30 @@ export function DomainDetailsPage() {
             <div>
               <dt className="text-sm text-muted-foreground mb-1">Created</dt>
               <dd className="text-sm font-medium">
-                {new Date(domain.createdAtUtc).toLocaleString()}
+                {new Date(domain.created_at_utc).toLocaleString()}
               </dd>
             </div>
-            {domain.verifiedAtUtc && (
+            {domain.verified_at_utc && (
               <div>
                 <dt className="text-sm text-muted-foreground mb-1">Verified</dt>
                 <dd className="text-sm font-medium">
-                  {new Date(domain.verifiedAtUtc).toLocaleString()}
+                  {new Date(domain.verified_at_utc).toLocaleString()}
                 </dd>
               </div>
             )}
-            {domain.mailFromSubdomain && (
+            {domain.mail_from_subdomain && (
               <div>
                 <dt className="text-sm text-muted-foreground mb-1">Mail From Subdomain</dt>
                 <dd className="text-sm font-medium font-mono">
-                  {domain.mailFromSubdomain}
+                  {domain.mail_from_subdomain}
                 </dd>
               </div>
             )}
-            {domain.identityArn && (
+            {domain.identity_arn && (
               <div className="md:col-span-2">
                 <dt className="text-sm text-muted-foreground mb-1">AWS Identity ARN</dt>
                 <dd className="text-xs font-mono bg-muted px-3 py-2 rounded break-all">
-                  {domain.identityArn}
+                  {domain.identity_arn}
                 </dd>
               </div>
             )}
