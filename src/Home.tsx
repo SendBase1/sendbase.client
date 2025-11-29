@@ -6,13 +6,16 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from '@/components/theme-provider';
 import { useState } from 'react';
-import { config } from '@/lib/config';
 
 function Home() {
     const { theme, setTheme } = useTheme();
     const [activeTab, setActiveTab] = useState<'curl' | 'node' | 'python'>('curl');
+
+    // Use a clean display URL for code examples (not the actual API URL)
+    const exampleApiUrl = 'https://api.socialhq.app';
+
     const codeExamples = {
-        curl: `curl -X POST '${config.apiBaseUrl}/v1/emails/send' \\
+        curl: `curl -X POST '${exampleApiUrl}/v1/emails/send' \\
   -H 'Authorization: Bearer YOUR_API_KEY' \\
   -H 'Content-Type: application/json' \\
   -d '{
