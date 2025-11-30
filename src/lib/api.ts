@@ -15,6 +15,17 @@ import type {
   WebhookEventType,
   WebhookDeliveryResponse,
   WebhookTestResponse,
+  BillingPlanResponse,
+  SubscriptionResponse,
+  UsageSummaryResponse,
+  InvoiceResponse,
+  CheckoutSessionResponse,
+  CustomerPortalResponse,
+  PlanLimitsResponse,
+  CreateCheckoutRequest,
+  ChangePlanRequest,
+  CreatePortalSessionRequest,
+  CancelSubscriptionRequest,
 } from './types';
 import { API_BASE_URL } from './config';
 import { triggerLogout } from '../contexts/AuthContext';
@@ -219,6 +230,99 @@ export const webhookApi = {
   async getEventTypes(): Promise<WebhookEventType[]> {
     const response = await fetchWithAuth('/api/v1/webhook-endpoints/event-types');
     if (!response.ok) throw new Error('Failed to fetch event types');
+    return response.json();
+  },
+};
+
+// Billing API
+export const billingApi = {
+  async getPlans(): Promise<BillingPlanResponse[]> {
+    const response = await fetchWithAuth('/api/v1/billing/plans');
+    if (!response.ok) throw new Error('Failed to fetch billing plans');
+    return response.json();
+  },
+
+  async getSubscription(): Promise<SubscriptionResponse | null> {
+    const response = await fetchWithAuth('/api/v1/billing/subscription');
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error('Failed to fetch subscription');
+    return response.json();
+  },
+
+  async getUsage(): Promise<UsageSummaryResponse> {
+    const response = await fetchWithAuth('/api/v1/billing/usage');
+    if (!response.ok) throw new Error('Failed to fetch usage');
+    return response.json();
+  },
+
+  async getInvoices(): Promise<InvoiceResponse[]> {
+    const response = await fetchWithAuth('/api/v1/billing/invoices');
+    if (!response.ok) throw new Error('Failed to fetch invoices');
+    return response.json();
+  },
+
+  async getLimits(): Promise<PlanLimitsResponse> {
+    const response = await fetchWithAuth('/api/v1/billing/limits');
+    if (!response.ok) throw new Error('Failed to fetch plan limits');
+    return response.json();
+  },
+
+  async createCheckoutSession(data: CreateCheckoutRequest): Promise<CheckoutSessionResponse> {
+    const response = await fetchWithAuth('/api/v1/billing/checkout', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create checkout session');
+    }
+    return response.json();
+  },
+
+  async changePlan(data: ChangePlanRequest): Promise<SubscriptionResponse> {
+    const response = await fetchWithAuth('/api/v1/billing/subscription/change-plan', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to change plan');
+    }
+    return response.json();
+  },
+
+  async cancelSubscription(data: CancelSubscriptionRequest): Promise<SubscriptionResponse> {
+    const response = await fetchWithAuth('/api/v1/billing/subscription/cancel', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to cancel subscription');
+    }
+    return response.json();
+  },
+
+  async reactivateSubscription(): Promise<SubscriptionResponse> {
+    const response = await fetchWithAuth('/api/v1/billing/subscription/reactivate', {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to reactivate subscription');
+    }
+    return response.json();
+  },
+
+  async createPortalSession(data: CreatePortalSessionRequest): Promise<CustomerPortalResponse> {
+    const response = await fetchWithAuth('/api/v1/billing/portal', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to create portal session');
+    }
     return response.json();
   },
 };

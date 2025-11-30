@@ -191,3 +191,108 @@ export interface WebhookTestResponse {
   message: string;
   status_code?: number;
 }
+
+// Billing Types
+
+export interface BillingPlanResponse {
+  id: string;
+  name: string;
+  displayName: string;
+  description?: string;
+  monthlyPriceCents: number;
+  includedEmails: number;
+  overageRateCentsPer1K: number;
+  allowsOverage: boolean;
+  maxDomains: number;
+  maxApiKeys: number;
+  maxWebhooks: number;
+  maxTeamMembers: number;
+  maxTemplates: number;
+  analyticsRetentionDays: number;
+  hasDedicatedIp: boolean;
+  supportLevel: string;
+  stripePaymentLinkUrl?: string;
+}
+
+export interface SubscriptionResponse {
+  id: string;
+  plan: BillingPlanResponse;
+  status: string;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+  canceledAt?: string;
+}
+
+export interface UsageSummaryResponse {
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  emailsSent: number;
+  emailsIncluded: number;
+  emailsRemaining: number;
+  overageEmails: number;
+  estimatedOverageCostCents: number;
+  usagePercentage: number;
+  daysRemainingInPeriod: number;
+}
+
+export interface InvoiceResponse {
+  id: string;
+  stripeInvoiceId: string;
+  amountDueCents: number;
+  amountPaidCents: number;
+  subtotalCents: number;
+  taxCents: number;
+  totalCents: number;
+  status: string;
+  periodStart: string;
+  periodEnd: string;
+  createdAt: string;
+  paidAt?: string;
+  hostedInvoiceUrl?: string;
+  invoicePdf?: string;
+}
+
+export interface CheckoutSessionResponse {
+  sessionId: string;
+  checkoutUrl: string;
+}
+
+export interface CustomerPortalResponse {
+  portalUrl: string;
+}
+
+export interface PlanLimitsResponse {
+  maxDomains: number;
+  maxApiKeys: number;
+  maxWebhookEndpoints: number;
+  maxTeamMembers: number;
+  currentDomains: number;
+  currentApiKeys: number;
+  currentWebhookEndpoints: number;
+  currentTeamMembers: number;
+  canAddDomain: boolean;
+  canAddApiKey: boolean;
+  canAddWebhookEndpoint: boolean;
+  canAddTeamMember: boolean;
+}
+
+// Billing Request Types
+
+export interface CreateCheckoutRequest {
+  planId: string;
+  successUrl: string;
+  cancelUrl: string;
+}
+
+export interface ChangePlanRequest {
+  newPlanId: string;
+}
+
+export interface CreatePortalSessionRequest {
+  returnUrl: string;
+}
+
+export interface CancelSubscriptionRequest {
+  cancelImmediately: boolean;
+}

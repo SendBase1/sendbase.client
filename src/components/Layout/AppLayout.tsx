@@ -14,6 +14,7 @@ import {
   Key,
   User,
   Webhook,
+  CreditCard,
 } from 'lucide-react';
 
 export function AppLayout() {
@@ -30,6 +31,7 @@ export function AppLayout() {
     { path: '/messages', label: 'Messages', icon: MessageSquare },
     { path: '/apikeys', label: 'API Keys', icon: Key },
     { path: '/webhooks', label: 'Webhooks', icon: Webhook },
+    { path: '/billing', label: 'Billing', icon: CreditCard },
   ];
 
   return (

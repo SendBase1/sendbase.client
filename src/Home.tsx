@@ -102,11 +102,7 @@ client.send(
                         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground pt-4">
                             <div className="flex items-center gap-2">
                                 <Check className="h-4 w-4" />
-                                <span>Free tier available</span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Check className="h-4 w-4" />
-                                <span>No credit card required</span>
+                                <span>Simple pricing</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Check className="h-4 w-4" />
@@ -276,9 +272,9 @@ client.send(
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto mt-16">
                     <Card className="flex flex-col p-6">
                         <div className="flex flex-col space-y-2">
-                            <h3 className="text-2xl font-bold">Free</h3>
+                            <h3 className="text-2xl font-bold">Starter</h3>
                             <div className="flex items-baseline text-4xl font-bold">
-                                $0
+                                $9
                                 <span className="text-sm font-normal text-muted-foreground ml-1">/month</span>
                             </div>
                         </div>
@@ -286,7 +282,7 @@ client.send(
                             <ul className="space-y-3 text-sm">
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>100 emails/day</span>
+                                    <span>25,000 emails/month</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
@@ -294,7 +290,11 @@ client.send(
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>Basic analytics</span>
+                                    <span>2 API keys</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <Check className="h-5 w-5 shrink-0" />
+                                    <span>Email support</span>
                                 </li>
                             </ul>
                         </div>
@@ -312,7 +312,7 @@ client.send(
                             </span>
                         </div>
                         <div className="flex flex-col space-y-2">
-                            <h3 className="text-2xl font-bold">Pro</h3>
+                            <h3 className="text-2xl font-bold">Growth</h3>
                             <div className="flex items-baseline text-4xl font-bold">
                                 $29
                                 <span className="text-sm font-normal text-muted-foreground ml-1">/month</span>
@@ -322,15 +322,15 @@ client.send(
                             <ul className="space-y-3 text-sm">
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>50,000 emails/month</span>
+                                    <span>100,000 emails/month</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>Unlimited domains</span>
+                                    <span>5 domains</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>Advanced analytics</span>
+                                    <span>10 API keys</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
@@ -339,7 +339,7 @@ client.send(
                             </ul>
                         </div>
                         <Link to="/login" className="mt-6">
-                            <Button className="w-full">Start Free Trial</Button>
+                            <Button className="w-full">Get Started</Button>
                         </Link>
                     </Card>
 
@@ -347,14 +347,19 @@ client.send(
                         <div className="flex flex-col space-y-2">
                             <h3 className="text-2xl font-bold">Enterprise</h3>
                             <div className="flex items-baseline text-4xl font-bold">
-                                Custom
+                                $99
+                                <span className="text-sm font-normal text-muted-foreground ml-1">/month</span>
                             </div>
                         </div>
                         <div className="flex-1 mt-6">
                             <ul className="space-y-3 text-sm">
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>Unlimited emails</span>
+                                    <span>500,000 emails/month</span>
+                                </li>
+                                <li className="flex items-start gap-2">
+                                    <Check className="h-5 w-5 shrink-0" />
+                                    <span>Unlimited domains</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
@@ -362,17 +367,15 @@ client.send(
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>Custom SLA</span>
-                                </li>
-                                <li className="flex items-start gap-2">
-                                    <Check className="h-5 w-5 shrink-0" />
                                     <span>24/7 support</span>
                                 </li>
                             </ul>
                         </div>
-                        <Button variant="outline" className="w-full mt-6">
-                            Contact Sales
-                        </Button>
+                        <Link to="/login" className="mt-6">
+                            <Button variant="outline" className="w-full">
+                                Get Started
+                            </Button>
+                        </Link>
                         </Card>
                     </div>
                 </div>
