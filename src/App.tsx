@@ -24,6 +24,7 @@ const WebhookDetailsPage = lazy(() => import('./pages/Webhooks').then(m => ({ de
 const TermsOfService = lazy(() => import('./pages/Legal').then(m => ({ default: m.TermsOfService })));
 const PrivacyPolicy = lazy(() => import('./pages/Legal').then(m => ({ default: m.PrivacyPolicy })));
 const AcceptableUsePolicy = lazy(() => import('./pages/Legal').then(m => ({ default: m.AcceptableUsePolicy })));
+const BillingPage = lazy(() => import('./pages/Billing/BillingPage').then(m => ({ default: m.BillingPage })));
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,7 @@ function App() {
                                     <Route path="/apikeys" element={<ApiKeysPage />} />
                                     <Route path="/webhooks" element={<WebhooksPage />} />
                                     <Route path="/webhooks/:id" element={<WebhookDetailsPage />} />
+                                    <Route path="/billing" element={<BillingPage />} />
                                     <Route path="/profile" element={<ProfilePage />} />
                                 </Route>
 
