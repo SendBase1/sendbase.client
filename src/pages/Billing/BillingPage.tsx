@@ -78,11 +78,11 @@ function getPlanIcon(planName: string) {
 }
 
 interface UserProfile {
-  user_id: string;
+  userId: string;
   email: string;
-  user_name: string;
-  tenant_id: string;
-  email_confirmed: boolean;
+  userName: string;
+  tenantId: string;
+  emailConfirmed: boolean;
 }
 
 export function BillingPage() {
@@ -123,7 +123,7 @@ export function BillingPage() {
 
   const handleSubscribe = (plan: BillingPlanResponse) => {
     if (plan.stripePaymentLinkUrl) {
-      if (!profile?.tenant_id) {
+      if (!profile?.tenantId) {
         toast.error('Unable to load account information. Please refresh and try again.');
         return;
       }
@@ -131,7 +131,7 @@ export function BillingPage() {
       if (userEmail) {
         url.searchParams.set('prefilled_email', userEmail);
       }
-      url.searchParams.set('client_reference_id', profile.tenant_id);
+      url.searchParams.set('client_reference_id', profile.tenantId);
       window.open(url.toString(), '_blank');
     } else {
       createCheckout.mutate({
