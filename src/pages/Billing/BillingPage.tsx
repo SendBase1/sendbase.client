@@ -60,11 +60,15 @@ function formatNumber(num: number): string {
   return new Intl.NumberFormat('en-US').format(num);
 }
 
-function formatDate(dateString: string): string {
-  return new Date(dateString).toLocaleDateString('en-US', {
+function formatDate(dateString: string | undefined | null): string {
+  if (!dateString) return 'N/A';
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return 'Invalid Date';
+  return date.toLocaleDateString(undefined, {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
   });
 }
 
@@ -518,7 +522,7 @@ export function BillingPage() {
               <TableBody>
                 {invoices.map((invoice) => (
                   <TableRow key={invoice.id}>
-                    <TableCell>{formatDate(invoice.createdAt)}</TableCell>
+                    <TableCell>{formatDate(invoice.createdAtUtc)}</TableCell>
                     <TableCell>
                       {formatDate(invoice.periodStart)} - {formatDate(invoice.periodEnd)}
                     </TableCell>

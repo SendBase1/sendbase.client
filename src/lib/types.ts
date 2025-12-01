@@ -239,18 +239,21 @@ export interface UsageSummaryResponse {
 export interface InvoiceResponse {
   id: string;
   stripeInvoiceId: string;
+  invoiceNumber?: string;
   amountDueCents: number;
   amountPaidCents: number;
   subtotalCents: number;
   taxCents: number;
   totalCents: number;
+  currency: string;
   status: string;
-  periodStart: string;
-  periodEnd: string;
-  createdAt: string;
-  paidAt?: string;
+  periodStart?: string;
+  periodEnd?: string;
+  dueDate?: string;
+  createdAtUtc: string;
+  paidAtUtc?: string;
   hostedInvoiceUrl?: string;
-  invoicePdf?: string;
+  invoicePdfUrl?: string;
 }
 
 export interface CheckoutSessionResponse {
