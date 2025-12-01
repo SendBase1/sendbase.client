@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
   useSubscription,
   useUsage,
@@ -12,6 +13,7 @@ import {
   useCreatePortalSession,
 } from '../../hooks/useBilling';
 import { useAuth } from '../../contexts/AuthContext';
+import { fetchWithAuth } from '../../lib/api';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
@@ -75,8 +77,24 @@ function getPlanIcon(planName: string) {
   return icons[planName.toLowerCase()] || <Zap className="h-6 w-6" />;
 }
 
+interface UserProfile {
+  user_id: string;
+  email: string;
+  user_name: string;
+  tenant_id: string;
+  email_confirmed: boolean;
+}
+
 export function BillingPage() {
   const { userEmail } = useAuth();
+  const { data: profile } = useQuery<UserProfile>({
+    queryKey: ['profile'],
+    queryFn: async () => {
+      const response = await fetchWithAuth('/api/auth/me');
+      if (!response.ok) throw new Error('Failed to fetch profile');
+      return response.json();
+    },
+  });
   const { data: subscription, isLoading: subLoading } = useSubscription();
   const { data: usage, isLoading: usageLoading } = useUsage();
   const { data: plans, isLoading: plansLoading } = useBillingPlans();
@@ -108,6 +126,9 @@ export function BillingPage() {
       const url = new URL(plan.stripePaymentLinkUrl);
       if (userEmail) {
         url.searchParams.set('prefilled_email', userEmail);
+      }
+      if (profile?.tenant_id) {
+        url.searchParams.set('client_reference_id', profile.tenant_id);
       }
       window.open(url.toString(), '_blank');
     } else {
