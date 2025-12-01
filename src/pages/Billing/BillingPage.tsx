@@ -87,7 +87,7 @@ interface UserProfile {
 
 export function BillingPage() {
   const { userEmail } = useAuth();
-  const { data: profile } = useQuery<UserProfile>({
+  const { data: profile, isLoading: profileLoading } = useQuery<UserProfile>({
     queryKey: ['profile'],
     queryFn: async () => {
       const response = await fetchWithAuth('/api/auth/me');
@@ -111,7 +111,7 @@ export function BillingPage() {
   const [showChangePlanDialog, setShowChangePlanDialog] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<BillingPlanResponse | null>(null);
 
-  const isLoading = subLoading || usageLoading || plansLoading;
+  const isLoading = subLoading || usageLoading || plansLoading || profileLoading;
 
   if (isLoading) {
     return (
@@ -123,13 +123,15 @@ export function BillingPage() {
 
   const handleSubscribe = (plan: BillingPlanResponse) => {
     if (plan.stripePaymentLinkUrl) {
+      if (!profile?.tenant_id) {
+        toast.error('Unable to load account information. Please refresh and try again.');
+        return;
+      }
       const url = new URL(plan.stripePaymentLinkUrl);
       if (userEmail) {
         url.searchParams.set('prefilled_email', userEmail);
       }
-      if (profile?.tenant_id) {
-        url.searchParams.set('client_reference_id', profile.tenant_id);
-      }
+      url.searchParams.set('client_reference_id', profile.tenant_id);
       window.open(url.toString(), '_blank');
     } else {
       createCheckout.mutate({
