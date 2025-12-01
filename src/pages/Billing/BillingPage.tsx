@@ -379,10 +379,16 @@ export function BillingPage() {
                   </div>
                   <CardTitle>{plan.displayName}</CardTitle>
                   <div className="mt-2">
-                    <span className="text-3xl font-bold">
-                      {formatCurrency(plan.monthlyPriceCents)}
-                    </span>
-                    <span className="text-muted-foreground">/month</span>
+                    {plan.name.toLowerCase() === 'enterprise' ? (
+                      <span className="text-3xl font-bold">Custom</span>
+                    ) : (
+                      <>
+                        <span className="text-3xl font-bold">
+                          {formatCurrency(plan.monthlyPriceCents)}
+                        </span>
+                        <span className="text-muted-foreground">/month</span>
+                      </>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-3 flex-1">
@@ -421,12 +427,24 @@ export function BillingPage() {
                       {plan.supportLevel} support
                     </li>
                   </ul>
-                  <p className="text-xs text-muted-foreground text-center pt-2">
-                    {formatCurrency(plan.overageRateCentsPer1K)}/1,000 additional emails
-                  </p>
+                  {plan.name.toLowerCase() !== 'enterprise' && (
+                    <p className="text-xs text-muted-foreground text-center pt-2">
+                      {formatCurrency(plan.overageRateCentsPer1K)}/1,000 additional emails
+                    </p>
+                  )}
                 </CardContent>
                 <CardFooter>
-                  {!subscription ? (
+                  {plan.name.toLowerCase() === 'enterprise' ? (
+                    <Button
+                      className="w-full"
+                      variant="outline"
+                      asChild
+                    >
+                      <a href="mailto:sales@socialhq.app?subject=Enterprise Plan Inquiry">
+                        Contact Sales
+                      </a>
+                    </Button>
+                  ) : !subscription ? (
                     <Button
                       className="w-full"
                       onClick={() => handleSubscribe(plan)}

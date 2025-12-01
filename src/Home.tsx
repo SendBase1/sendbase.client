@@ -347,15 +347,14 @@ client.send(
                         <div className="flex flex-col space-y-2">
                             <h3 className="text-2xl font-bold">Enterprise</h3>
                             <div className="flex items-baseline text-4xl font-bold">
-                                $99
-                                <span className="text-sm font-normal text-muted-foreground ml-1">/month</span>
+                                Custom
                             </div>
                         </div>
                         <div className="flex-1 mt-6">
                             <ul className="space-y-3 text-sm">
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>500,000 emails/month</span>
+                                    <span>Custom email volume</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
@@ -371,11 +370,11 @@ client.send(
                                 </li>
                             </ul>
                         </div>
-                        <Link to="/login" className="mt-6">
+                        <a href="mailto:sales@socialhq.app?subject=Enterprise Plan Inquiry" className="mt-6">
                             <Button variant="outline" className="w-full">
-                                Get Started
+                                Contact Sales
                             </Button>
-                        </Link>
+                        </a>
                         </Card>
                     </div>
                 </div>
