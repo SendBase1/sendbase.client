@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -49,6 +50,7 @@ type CreateKeyFormData = z.infer<typeof createKeySchema>;
 type PermissionMode = 'preset' | 'custom';
 
 export function ApiKeysPage() {
+  const navigate = useNavigate();
   const { data: apiKeys, isLoading } = useApiKeys();
   const { data: scopesData } = useApiKeyScopes();
   const { data: domains } = useDomains();
@@ -215,8 +217,17 @@ export function ApiKeysPage() {
       {verifiedDomains.length === 0 && (
         <Alert>
           <AlertTriangle className="h-4 w-4" />
-          <AlertDescription>
-            You need at least one verified domain before you can create API keys.
+          <AlertDescription className="flex items-center justify-between">
+            <span>You need at least one verified domain before you can create API keys.</span>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/domains')}
+              className="ml-4"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              Add Domain
+            </Button>
           </AlertDescription>
         </Alert>
       )}
