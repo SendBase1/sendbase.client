@@ -1,9 +1,6 @@
-import { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
-import { Input } from '../../components/ui/input';
-import { Label } from '../../components/ui/label';
 import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
 import {
@@ -12,106 +9,37 @@ import {
   Building2,
   Shield,
   CheckCircle2,
-  AlertCircle,
   RefreshCw,
-  Key,
+  ExternalLink,
 } from 'lucide-react';
-import { toast } from 'sonner';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchWithAuth } from '../../lib/api';
 
 interface UserProfile {
-  user_id: string;
+  userId: string;
   email: string;
-  user_name: string;
-  tenant_id: string;
-  email_confirmed: boolean;
+  name: string;
+  tenantId: string;
+  emailConfirmed: boolean;
+  availableTenants: TenantInfo[];
 }
 
 interface TenantInfo {
   id: string;
   name: string;
-  status: number;
-  status_text: string;
-  created_at_utc: string;
 }
 
 export function ProfilePage() {
   const { userEmail } = useAuth();
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
 
   const { data: profile, isLoading: profileLoading } = useQuery<UserProfile>({
     queryKey: ['profile'],
     queryFn: async () => {
-      const response = await fetchWithAuth('/api/auth/me');
+      const response = await fetchWithAuth('/api/entraauth/me');
       if (!response.ok) throw new Error('Failed to fetch profile');
       return response.json();
     },
   });
-
-  const { data: tenants, isLoading: tenantsLoading } = useQuery<TenantInfo[]>({
-    queryKey: ['tenants'],
-    queryFn: async () => {
-      const response = await fetchWithAuth('/api/tenants');
-      if (!response.ok) throw new Error('Failed to fetch tenants');
-      return response.json();
-    },
-  });
-
-  const resendVerification = useMutation({
-    mutationFn: async () => {
-      const response = await fetchWithAuth('/api/auth/resend-verification', {
-        method: 'POST',
-        body: JSON.stringify({ email: profile?.email }),
-      });
-      if (!response.ok) throw new Error('Failed to resend verification');
-    },
-    onSuccess: () => {
-      toast.success('Verification email sent! Please check your inbox.');
-    },
-    onError: () => {
-      toast.error('Failed to send verification email. Please try again.');
-    },
-  });
-
-  const changePassword = useMutation({
-    mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
-      const response = await fetchWithAuth('/api/auth/change-password', {
-        method: 'POST',
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Failed to change password');
-      }
-    },
-    onSuccess: () => {
-      toast.success('Password changed successfully!');
-      setIsChangingPassword(false);
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-    },
-    onError: (error: Error) => {
-      toast.error(error.message || 'Failed to change password');
-    },
-  });
-
-  const handleChangePassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newPassword !== confirmPassword) {
-      toast.error('New passwords do not match');
-      return;
-    }
-    if (newPassword.length < 8) {
-      toast.error('Password must be at least 8 characters');
-      return;
-    }
-    changePassword.mutate({ currentPassword, newPassword });
-  };
 
   if (profileLoading) {
     return (
@@ -144,60 +72,30 @@ export function ProfilePage() {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label className="text-muted-foreground">Email</Label>
+                <p className="text-sm text-muted-foreground">Name</p>
                 <div className="flex items-center gap-2 mt-1">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  <span className="font-medium">{profile?.email || userEmail}</span>
+                  <User className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">{profile?.name || 'Not set'}</span>
                 </div>
               </div>
               <div>
-                <Label className="text-muted-foreground">User ID</Label>
-                <div className="mt-1">
-                  <code className="text-xs bg-muted px-2 py-1 rounded">
-                    {profile?.user_id}
-                  </code>
+                <p className="text-sm text-muted-foreground">Email</p>
+                <div className="flex items-center gap-2 mt-1">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="font-medium">{profile?.email || userEmail}</span>
                 </div>
               </div>
             </div>
 
             <Separator />
 
-            {/* Email Verification Status */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                {profile?.email_confirmed ? (
-                  <>
-                    <CheckCircle2 className="h-5 w-5 text-green-500" />
-                    <span className="text-sm">Email verified</span>
-                    <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
-                      Verified
-                    </Badge>
-                  </>
-                ) : (
-                  <>
-                    <AlertCircle className="h-5 w-5 text-yellow-500" />
-                    <span className="text-sm">Email not verified</span>
-                    <Badge variant="outline" className="bg-yellow-500/10 text-yellow-500 border-yellow-500/20">
-                      Pending
-                    </Badge>
-                  </>
-                )}
-              </div>
-              {!profile?.email_confirmed && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => resendVerification.mutate()}
-                  disabled={resendVerification.isPending}
-                >
-                  {resendVerification.isPending ? (
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <Mail className="h-4 w-4 mr-2" />
-                  )}
-                  Resend Verification
-                </Button>
-              )}
+            {/* Email Verification Status - Entra handles verification */}
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-green-500" />
+              <span className="text-sm">Email verified</span>
+              <Badge variant="outline" className="bg-green-500/10 text-green-500 border-green-500/20">
+                Verified
+              </Badge>
             </div>
           </CardContent>
         </Card>
@@ -207,31 +105,26 @@ export function ProfilePage() {
           <CardHeader>
             <div className="flex items-center gap-2">
               <Building2 className="h-5 w-5 text-muted-foreground" />
-              <CardTitle>Organization</CardTitle>
+              <CardTitle>Organizations</CardTitle>
             </div>
-            <CardDescription>Your organization and team settings</CardDescription>
+            <CardDescription>Your organizations</CardDescription>
           </CardHeader>
           <CardContent>
-            {tenantsLoading ? (
-              <div className="flex items-center justify-center py-4">
-                <RefreshCw className="h-5 w-5 animate-spin text-muted-foreground" />
-              </div>
-            ) : tenants && tenants.length > 0 ? (
+            {profile?.availableTenants && profile.availableTenants.length > 0 ? (
               <div className="space-y-3">
-                {tenants.map((tenant) => (
+                {profile.availableTenants.map((tenant) => (
                   <div
                     key={tenant.id}
                     className="flex items-center justify-between p-3 rounded-lg border bg-muted/30"
                   >
                     <div>
                       <p className="font-medium">{tenant.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Created {new Date(tenant.created_at_utc).toLocaleDateString()}
-                      </p>
                     </div>
-                    <Badge variant="outline">
-                      {tenant.status_text || 'Active'}
-                    </Badge>
+                    {tenant.id === profile.tenantId && (
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                        Current
+                      </Badge>
+                    )}
                   </div>
                 ))}
               </div>
@@ -248,74 +141,19 @@ export function ProfilePage() {
               <Shield className="h-5 w-5 text-muted-foreground" />
               <CardTitle>Security</CardTitle>
             </div>
-            <CardDescription>Manage your password and security settings</CardDescription>
+            <CardDescription>Manage your security settings</CardDescription>
           </CardHeader>
           <CardContent>
-            {!isChangingPassword ? (
-              <Button
-                variant="outline"
-                onClick={() => setIsChangingPassword(true)}
-              >
-                <Key className="h-4 w-4 mr-2" />
-                Change Password
-              </Button>
-            ) : (
-              <form onSubmit={handleChangePassword} className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="currentPassword">Current Password</Label>
-                  <Input
-                    id="currentPassword"
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder="Enter current password"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="newPassword">New Password</Label>
-                  <Input
-                    id="newPassword"
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Enter new password"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                  <Input
-                    id="confirmPassword"
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Confirm new password"
-                    required
-                  />
-                </div>
-                <div className="flex gap-2">
-                  <Button type="submit" disabled={changePassword.isPending}>
-                    {changePassword.isPending && (
-                      <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    )}
-                    Update Password
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => {
-                      setIsChangingPassword(false);
-                      setCurrentPassword('');
-                      setNewPassword('');
-                      setConfirmPassword('');
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            )}
+            <p className="text-sm text-muted-foreground mb-4">
+              Your account is secured through Microsoft Entra ID. To change your password or manage security settings, visit your Microsoft account.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => window.open('https://mysignins.microsoft.com/security-info', '_blank')}
+            >
+              <ExternalLink className="h-4 w-4 mr-2" />
+              Manage Security Settings
+            </Button>
           </CardContent>
         </Card>
       </div>

@@ -34,7 +34,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const initializingRef = useRef(false);
 
   const account = accounts[0];
-  const userEmail = account?.username || null;
+  // For Entra External ID (CIAM), email is in idTokenClaims, not username
+  const idTokenClaims = account?.idTokenClaims as { email?: string; preferred_username?: string } | undefined;
+  const userEmail = idTokenClaims?.email || idTokenClaims?.preferred_username || account?.username || null;
   const userId = account?.localAccountId || null;
   const userName = account?.name || null;
 

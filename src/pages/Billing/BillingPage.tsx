@@ -94,7 +94,7 @@ export function BillingPage() {
   const { data: profile, isLoading: profileLoading } = useQuery<UserProfile>({
     queryKey: ['profile'],
     queryFn: async () => {
-      const response = await fetchWithAuth('/api/auth/me');
+      const response = await fetchWithAuth('/api/entraauth/me');
       if (!response.ok) throw new Error('Failed to fetch profile');
       return response.json();
     },
