@@ -1,13 +1,22 @@
-import { createContext, useContext, useState, useEffect, useCallback, type ReactNode } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
+import { useMsal, useIsAuthenticated } from '@azure/msal-react';
+import { InteractionStatus } from '@azure/msal-browser';
+import { loginRequest } from '@/lib/authConfig';
+import { entraAuthApi, setInitializing, type TenantInfo } from '@/lib/api';
 
 interface AuthContextType {
   isAuthenticated: boolean;
   userEmail: string | null;
   userId: string | null;
-  login: (token: string, email: string, userId: string) => void;
+  userName: string | null;
+  tenantId: string | null;
+  availableTenants: TenantInfo[];
+  login: () => Promise<void>;
   logout: () => void;
+  switchTenant: (tenantId: string) => Promise<void>;
   isLoading: boolean;
+  isInitialized: boolean;
+  getAccessToken: () => Promise<string | null>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -16,41 +25,107 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 const AUTH_LOGOUT_EVENT = 'auth:logout';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [userId, setUserId] = useState<string | null>(null);
+  const { instance, accounts, inProgress } = useMsal();
+  const isAuthenticated = useIsAuthenticated();
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [tenantId, setTenantId] = useState<string | null>(null);
+  const [availableTenants, setAvailableTenants] = useState<TenantInfo[]>([]);
+  const initializingRef = useRef(false);
 
-  // Check for existing auth on mount
+  const account = accounts[0];
+  const userEmail = account?.username || null;
+  const userId = account?.localAccountId || null;
+  const userName = account?.name || null;
+
+  // Initialize user session with backend after MSAL authentication
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const email = localStorage.getItem('userEmail');
-    const id = localStorage.getItem('userId');
+    const initializeUser = async () => {
+      if (!isAuthenticated || initializingRef.current || isInitialized) return;
+      if (inProgress !== InteractionStatus.None) return;
+      if (!account) return; // Wait for account to be available
 
-    if (token && email && id) {
-      setIsAuthenticated(true);
-      setUserEmail(email);
-      setUserId(id);
+      initializingRef.current = true;
+      setInitializing(true); // Prevent 401 from triggering logout during init
+      try {
+        console.log('Initializing user session with backend...');
+        const response = await entraAuthApi.initialize();
+        setTenantId(response.tenantId);
+        setAvailableTenants(response.availableTenants);
+        setIsInitialized(true);
+        console.log('User initialized:', response.isNewUser ? 'new user' : 'existing user');
+      } catch (error) {
+        console.error('Failed to initialize user:', error);
+        // Still mark as initialized to prevent infinite retries
+        setIsInitialized(true);
+      } finally {
+        initializingRef.current = false;
+        setInitializing(false);
+      }
+    };
+
+    initializeUser();
+  }, [isAuthenticated, inProgress, isInitialized, account]);
+
+  // Set loading state based on MSAL interaction status
+  useEffect(() => {
+    if (inProgress === InteractionStatus.None) {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  }, []);
+  }, [inProgress]);
+
+  const login = useCallback(async () => {
+    try {
+      await instance.loginRedirect(loginRequest);
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
+  }, [instance]);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userEmail');
-    localStorage.removeItem('userId');
-    setIsAuthenticated(false);
-    setUserEmail(null);
-    setUserId(null);
+    // Clear tenant state on logout
+    setTenantId(null);
+    setAvailableTenants([]);
+    setIsInitialized(false);
+    instance.logoutRedirect({
+      postLogoutRedirectUri: window.location.origin,
+    });
+  }, [instance]);
 
-    // Only navigate if not already on public pages
-    const publicPaths = ['/', '/login'];
-    if (!publicPaths.includes(location.pathname)) {
-      navigate('/login', { replace: true });
+  const switchTenant = useCallback(async (newTenantId: string) => {
+    try {
+      const response = await entraAuthApi.switchTenant(newTenantId);
+      setTenantId(response.tenantId);
+      setAvailableTenants(response.availableTenants);
+    } catch (error) {
+      console.error('Failed to switch tenant:', error);
+      throw error;
     }
-  }, [navigate, location.pathname]);
+  }, []);
+
+  // Get access token for API calls
+  const getAccessToken = useCallback(async (): Promise<string | null> => {
+    if (!account) return null;
+
+    try {
+      const response = await instance.acquireTokenSilent({
+        ...loginRequest,
+        account,
+      });
+      return response.accessToken;
+    } catch (error) {
+      console.error('Token acquisition error:', error);
+      // If silent acquisition fails, try interactive
+      try {
+        await instance.acquireTokenRedirect(loginRequest);
+        return null; // Redirect will happen, so we won't get here
+      } catch (interactiveError) {
+        console.error('Interactive token acquisition error:', interactiveError);
+        return null;
+      }
+    }
+  }, [instance, account]);
 
   // Listen for logout events (from API 401 responses)
   useEffect(() => {
@@ -62,29 +137,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => window.removeEventListener(AUTH_LOGOUT_EVENT, handleLogoutEvent);
   }, [logout]);
 
-  // Listen for storage changes (cross-tab logout)
-  useEffect(() => {
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'authToken' && e.newValue === null) {
-        logout();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, [logout]);
-
-  const login = useCallback((token: string, email: string, id: string) => {
-    localStorage.setItem('authToken', token);
-    localStorage.setItem('userEmail', email);
-    localStorage.setItem('userId', id);
-    setIsAuthenticated(true);
-    setUserEmail(email);
-    setUserId(id);
-  }, []);
-
   return (
-    <AuthContext.Provider value={{ isAuthenticated, userEmail, userId, login, logout, isLoading }}>
+    <AuthContext.Provider value={{
+      isAuthenticated,
+      userEmail,
+      userId,
+      userName,
+      tenantId,
+      availableTenants,
+      login,
+      logout,
+      switchTenant,
+      isLoading,
+      isInitialized,
+      getAccessToken,
+    }}>
       {children}
     </AuthContext.Provider>
   );

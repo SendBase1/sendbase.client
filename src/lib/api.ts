@@ -29,12 +29,67 @@ import type {
 } from './types';
 import { API_BASE_URL } from './config';
 import { triggerLogout } from '../contexts/AuthContext';
+import { msalInstance, loginRequest } from './authConfig';
 
 // Re-export for backward compatibility
 export { API_BASE_URL };
 
+// Types for Entra auth
+export interface InitializeUserResponse {
+  userId: string;
+  email: string | null;
+  name: string | null;
+  tenantId: string;
+  isNewUser: boolean;
+  availableTenants: TenantInfo[];
+}
+
+export interface TenantInfo {
+  id: string;
+  name: string;
+}
+
+export interface UserInfo {
+  userId: string;
+  email: string | null;
+  name: string | null;
+  tenantId: string | null;
+  availableTenants: TenantInfo[];
+  emailConfirmed: boolean;
+}
+
+// Get access token from MSAL
+async function getAccessToken(): Promise<string | null> {
+  const accounts = msalInstance.getAllAccounts();
+  if (accounts.length === 0) return null;
+
+  try {
+    const response = await msalInstance.acquireTokenSilent({
+      ...loginRequest,
+      account: accounts[0],
+    });
+    // For CIAM with openid scopes, we get an ID token
+    // Log token info for debugging (without exposing the actual token)
+    if (response.idToken) {
+      console.log('[API] Got ID token, expires:', response.expiresOn);
+    }
+    // Use idToken for authentication with our backend since we're using CIAM openid scopes
+    return response.idToken || response.accessToken;
+  } catch (error) {
+    console.error('Failed to acquire token silently:', error);
+    return null;
+  }
+}
+
+// Flag to prevent logout during initialization
+let isInitializing = false;
+
+export function setInitializing(value: boolean) {
+  isInitializing = value;
+}
+
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
-  const token = localStorage.getItem('authToken');
+  const token = await getAccessToken();
 
   const headers = {
     'Content-Type': 'application/json',
@@ -47,8 +102,8 @@ export async function fetchWithAuth(url: string, options: RequestInit = {}) {
     headers,
   });
 
-  // Handle 401 Unauthorized - trigger logout
-  if (response.status === 401) {
+  // Handle 401 Unauthorized - trigger logout (but not during initialization)
+  if (response.status === 401 && !isInitializing) {
     triggerLogout();
     throw new Error('Session expired. Please log in again.');
   }
@@ -322,6 +377,40 @@ export const billingApi = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || 'Failed to create portal session');
+    }
+    return response.json();
+  },
+};
+
+// Entra Auth API
+export const entraAuthApi = {
+  async initialize(): Promise<InitializeUserResponse> {
+    const response = await fetchWithAuth('/api/entraauth/initialize', {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to initialize user');
+    }
+    return response.json();
+  },
+
+  async getMe(): Promise<UserInfo> {
+    const response = await fetchWithAuth('/api/entraauth/me');
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to get user info');
+    }
+    return response.json();
+  },
+
+  async switchTenant(tenantId: string): Promise<{ tenantId: string; tenantName: string; availableTenants: TenantInfo[] }> {
+    const response = await fetchWithAuth('/api/entraauth/switch-tenant', {
+      method: 'POST',
+      body: JSON.stringify({ tenantId }),
+    });
+    if (!response.ok) {
+      throw new Error('Failed to switch tenant');
     }
     return response.json();
   },

@@ -1,15 +1,25 @@
-import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Mail, Send, Shield, Zap, BarChart3, Clock, Check } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from '@/components/theme-provider';
-import { useState } from 'react';
+import { useAuth } from './contexts/AuthContext';
 
 function Home() {
     const { theme, setTheme } = useTheme();
     const [activeTab, setActiveTab] = useState<'curl' | 'node' | 'python'>('curl');
+    const { isAuthenticated, isLoading } = useAuth();
+    const navigate = useNavigate();
+
+    // Redirect authenticated users to dashboard
+    useEffect(() => {
+        if (isAuthenticated && !isLoading) {
+            navigate('/dashboard', { replace: true });
+        }
+    }, [isAuthenticated, isLoading, navigate]);
 
     // Use a clean display URL for code examples (not the actual API URL)
     const exampleApiUrl = 'https://api.socialhq.app';

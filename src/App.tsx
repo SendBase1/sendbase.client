@@ -1,11 +1,13 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MsalProvider } from '@azure/msal-react';
 import { ThemeProvider } from '@/components/theme-provider';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AppLayout } from './components/Layout/AppLayout';
-import { RefreshCw } from 'lucide-react';
+import { msalInstance } from '@/lib/authConfig';
+import { Mail } from 'lucide-react';
 import './App.css';
 
 // Lazy load pages for code splitting
@@ -28,21 +30,28 @@ const BillingPage = lazy(() => import('./pages/Billing/BillingPage').then(m => (
 
 const queryClient = new QueryClient();
 
-// Loading fallback component
+// Loading fallback component - minimal branded loader for lazy-loaded pages
 function PageLoader() {
     return (
-        <div className="flex items-center justify-center h-64">
-            <RefreshCw className="h-8 w-8 animate-spin text-muted-foreground" />
+        <div className="flex flex-col items-center justify-center h-64 space-y-4">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-card border">
+                <Mail className="h-6 w-6 text-muted-foreground" />
+            </div>
+            <div className="relative h-8 w-8">
+                <div className="absolute inset-0 rounded-full border-2 border-muted" />
+                <div className="absolute inset-0 rounded-full border-2 border-transparent border-t-foreground animate-spin" />
+            </div>
         </div>
     );
 }
 
 function App() {
     return (
-        <QueryClientProvider client={queryClient}>
-            <ThemeProvider defaultTheme="dark">
-                <BrowserRouter>
-                    <AuthProvider>
+        <MsalProvider instance={msalInstance}>
+            <QueryClientProvider client={queryClient}>
+                <ThemeProvider defaultTheme="dark">
+                    <BrowserRouter>
+                        <AuthProvider>
                         <Suspense fallback={<PageLoader />}>
                             <Routes>
                                 <Route path="/" element={<Home />} />
@@ -78,10 +87,11 @@ function App() {
                                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
                             </Routes>
                         </Suspense>
-                    </AuthProvider>
-                </BrowserRouter>
-            </ThemeProvider>
-        </QueryClientProvider>
+                        </AuthProvider>
+                    </BrowserRouter>
+                </ThemeProvider>
+            </QueryClientProvider>
+        </MsalProvider>
     );
 }
 
