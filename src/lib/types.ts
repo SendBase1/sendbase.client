@@ -299,3 +299,39 @@ export interface CreatePortalSessionRequest {
 export interface CancelSubscriptionRequest {
   cancelImmediately: boolean;
 }
+
+// Tenant Types
+
+export type TenantRole = 'Owner' | 'Admin' | 'Viewer';
+export type InvitationStatus = 'Pending' | 'Accepted' | 'Expired' | 'Revoked';
+export type TenantStatus = 'Active' | 'Suspended';
+
+export interface TenantResponse {
+  id: string;
+  name: string;
+  status: TenantStatus;
+  created_at_utc: string;
+  member_count: number;
+  current_user_role: TenantRole;
+}
+
+export interface TenantMemberResponse {
+  user_id: string;
+  email: string;
+  name?: string;
+  role: TenantRole;
+  joined_at_utc: string;
+}
+
+export interface TenantInvitationResponse {
+  id: string;
+  tenant_id: string;
+  tenant_name?: string;
+  invitee_email: string;
+  role: TenantRole;
+  status: InvitationStatus;
+  invited_by_email?: string;
+  created_at_utc: string;
+  expires_at_utc: string;
+  token?: string; // Only present on create
+}

@@ -2,6 +2,7 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { useTheme } from '../theme-provider';
 import { useAuth } from '../../contexts/AuthContext';
+import { WorkspaceSwitcher } from '../WorkspaceSwitcher';
 import {
   Mail,
   Send,
@@ -15,6 +16,8 @@ import {
   User,
   Webhook,
   CreditCard,
+  Settings,
+  HelpCircle,
 } from 'lucide-react';
 
 export function AppLayout() {
@@ -31,7 +34,9 @@ export function AppLayout() {
     { path: '/messages', label: 'Messages', icon: MessageSquare },
     { path: '/apikeys', label: 'API Keys', icon: Key },
     { path: '/webhooks', label: 'Webhooks', icon: Webhook },
+    { path: '/settings', label: 'Settings', icon: Settings },
     { path: '/billing', label: 'Billing', icon: CreditCard },
+    { path: '/contact', label: 'Contact Us', icon: HelpCircle },
   ];
 
   return (
@@ -39,12 +44,13 @@ export function AppLayout() {
       {/* Sidebar */}
       <aside className="fixed inset-y-0 left-0 z-50 w-64 border-r bg-muted/40">
         <div className="flex h-full flex-col gap-2">
-          {/* Logo */}
-          <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <Link to="/dashboard" className="flex items-center gap-2 font-semibold">
+          {/* Logo and Workspace Switcher */}
+          <div className="border-b px-4 py-3 lg:px-6">
+            <Link to="/dashboard" className="flex items-center gap-2 font-semibold mb-3">
               <Mail className="h-6 w-6" />
               <span>EmailAPI</span>
             </Link>
+            <WorkspaceSwitcher />
           </div>
 
           {/* Navigation */}

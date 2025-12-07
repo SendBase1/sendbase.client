@@ -26,7 +26,10 @@ const WebhookDetailsPage = lazy(() => import('./pages/Webhooks').then(m => ({ de
 const TermsOfService = lazy(() => import('./pages/Legal').then(m => ({ default: m.TermsOfService })));
 const PrivacyPolicy = lazy(() => import('./pages/Legal').then(m => ({ default: m.PrivacyPolicy })));
 const AcceptableUsePolicy = lazy(() => import('./pages/Legal').then(m => ({ default: m.AcceptableUsePolicy })));
+const ContactPage = lazy(() => import('./pages/Contact').then(m => ({ default: m.ContactPage })));
 const BillingPage = lazy(() => import('./pages/Billing/BillingPage').then(m => ({ default: m.BillingPage })));
+const AcceptInvitationPage = lazy(() => import('./pages/AcceptInvitation/AcceptInvitationPage').then(m => ({ default: m.AcceptInvitationPage })));
+const SettingsPage = lazy(() => import('./pages/Settings/SettingsPage').then(m => ({ default: m.SettingsPage })));
 
 const queryClient = new QueryClient();
 
@@ -61,6 +64,14 @@ function App() {
                                 <Route path="/terms" element={<TermsOfService />} />
                                 <Route path="/privacy" element={<PrivacyPolicy />} />
                                 <Route path="/acceptable-use" element={<AcceptableUsePolicy />} />
+                                <Route path="/contact" element={<ContactPage />} />
+
+                                {/* Invitation acceptance - requires auth but not full layout */}
+                                <Route path="/invitations/accept" element={
+                                    <ProtectedRoute>
+                                        <AcceptInvitationPage />
+                                    </ProtectedRoute>
+                                } />
 
                                 {/* Protected routes with AppLayout */}
                                 <Route
@@ -79,6 +90,7 @@ function App() {
                                     <Route path="/apikeys" element={<ApiKeysPage />} />
                                     <Route path="/webhooks" element={<WebhooksPage />} />
                                     <Route path="/webhooks/:id" element={<WebhookDetailsPage />} />
+                                    <Route path="/settings" element={<SettingsPage />} />
                                     <Route path="/billing" element={<BillingPage />} />
                                     <Route path="/profile" element={<ProfilePage />} />
                                 </Route>

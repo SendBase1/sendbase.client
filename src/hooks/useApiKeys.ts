@@ -1,11 +1,14 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { apiKeyApi } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 import type { CreateApiKeyRequest } from '../lib/types';
 
 export function useApiKeys() {
+  const { tenantId } = useAuth();
   return useQuery({
-    queryKey: ['apikeys'],
+    queryKey: ['apikeys', tenantId],
     queryFn: () => apiKeyApi.getAll(),
+    enabled: !!tenantId,
   });
 }
 

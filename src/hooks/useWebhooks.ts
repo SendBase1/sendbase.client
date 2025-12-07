@@ -1,44 +1,55 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { webhookApi } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 import type {
   CreateWebhookEndpointRequest,
   UpdateWebhookEndpointRequest,
 } from '../lib/types';
 
-// Query keys
-export const webhookKeys = {
-  all: ['webhooks'] as const,
-  lists: () => [...webhookKeys.all, 'list'] as const,
-  list: () => [...webhookKeys.lists()] as const,
-  details: () => [...webhookKeys.all, 'detail'] as const,
-  detail: (id: string) => [...webhookKeys.details(), id] as const,
-  deliveries: (id: string) => [...webhookKeys.detail(id), 'deliveries'] as const,
-  eventTypes: () => [...webhookKeys.all, 'eventTypes'] as const,
-};
+// Query keys factory - includes tenantId for proper cache invalidation on tenant switch
+export const createWebhookKeys = (tenantId: string | null) => ({
+  all: ['webhooks', tenantId] as const,
+  lists: () => [...createWebhookKeys(tenantId).all, 'list'] as const,
+  list: () => [...createWebhookKeys(tenantId).lists()] as const,
+  details: () => [...createWebhookKeys(tenantId).all, 'detail'] as const,
+  detail: (id: string) => [...createWebhookKeys(tenantId).details(), id] as const,
+  deliveries: (id: string) => [...createWebhookKeys(tenantId).detail(id), 'deliveries'] as const,
+  eventTypes: () => ['webhooks', 'eventTypes'] as const, // Event types are global
+});
+
+// Legacy export for backwards compatibility
+export const webhookKeys = createWebhookKeys(null);
 
 // Fetch all webhooks
 export function useWebhooks() {
+  const { tenantId } = useAuth();
+  const keys = createWebhookKeys(tenantId);
   return useQuery({
-    queryKey: webhookKeys.list(),
+    queryKey: keys.list(),
     queryFn: () => webhookApi.getAll(),
+    enabled: !!tenantId,
   });
 }
 
 // Fetch single webhook
 export function useWebhook(id: string) {
+  const { tenantId } = useAuth();
+  const keys = createWebhookKeys(tenantId);
   return useQuery({
-    queryKey: webhookKeys.detail(id),
+    queryKey: keys.detail(id),
     queryFn: () => webhookApi.getById(id),
-    enabled: !!id,
+    enabled: !!id && !!tenantId,
   });
 }
 
 // Fetch webhook deliveries
 export function useWebhookDeliveries(id: string, limit: number = 50) {
+  const { tenantId } = useAuth();
+  const keys = createWebhookKeys(tenantId);
   return useQuery({
-    queryKey: webhookKeys.deliveries(id),
+    queryKey: keys.deliveries(id),
     queryFn: () => webhookApi.getDeliveries(id, limit),
-    enabled: !!id,
+    enabled: !!id && !!tenantId,
   });
 }
 

@@ -26,6 +26,10 @@ import type {
   ChangePlanRequest,
   CreatePortalSessionRequest,
   CancelSubscriptionRequest,
+  TenantRole,
+  TenantMemberResponse,
+  TenantInvitationResponse,
+  TenantResponse,
 } from './types';
 import { API_BASE_URL } from './config';
 import { triggerLogout } from '../contexts/AuthContext';
@@ -88,13 +92,25 @@ export function setInitializing(value: boolean) {
   isInitializing = value;
 }
 
+// Current tenant ID for API requests
+let currentTenantId: string | null = null;
+
+export function setCurrentTenantId(tenantId: string | null) {
+  currentTenantId = tenantId;
+}
+
+export function getCurrentTenantId(): string | null {
+  return currentTenantId;
+}
+
 export async function fetchWithAuth(url: string, options: RequestInit = {}) {
   const token = await getAccessToken();
 
-  const headers = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
-    ...options.headers,
+    ...(currentTenantId && { 'X-Tenant-Id': currentTenantId }),
+    ...options.headers as Record<string, string>,
   };
 
   const response = await fetch(`${API_BASE_URL}${url}`, {
@@ -411,6 +427,151 @@ export const entraAuthApi = {
     });
     if (!response.ok) {
       throw new Error('Failed to switch tenant');
+    }
+    return response.json();
+  },
+};
+
+// Tenants API
+export const tenantsApi = {
+  async getAll(): Promise<TenantResponse[]> {
+    const response = await fetchWithAuth('/api/tenants');
+    if (!response.ok) throw new Error('Failed to fetch tenants');
+    return response.json();
+  },
+
+  async getById(tenantId: string): Promise<TenantResponse> {
+    const response = await fetchWithAuth(`/api/tenants/${tenantId}`);
+    if (!response.ok) throw new Error('Failed to fetch tenant');
+    return response.json();
+  },
+
+  async create(name: string): Promise<TenantResponse> {
+    const response = await fetchWithAuth('/api/tenants', {
+      method: 'POST',
+      body: JSON.stringify({ name }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create tenant');
+    }
+    return response.json();
+  },
+
+  async update(tenantId: string, name: string): Promise<TenantResponse> {
+    const response = await fetchWithAuth(`/api/tenants/${tenantId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ name }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update tenant');
+    }
+    return response.json();
+  },
+
+  async delete(tenantId: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/tenants/${tenantId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to delete tenant');
+    }
+  },
+
+  // Members
+  async getMembers(tenantId: string): Promise<TenantMemberResponse[]> {
+    const response = await fetchWithAuth(`/api/tenants/${tenantId}/members`);
+    if (!response.ok) throw new Error('Failed to fetch members');
+    return response.json();
+  },
+
+  async removeMember(tenantId: string, userId: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/tenants/${tenantId}/members/${userId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to remove member');
+  },
+
+  async updateMemberRole(tenantId: string, userId: string, role: TenantRole): Promise<TenantMemberResponse> {
+    const response = await fetchWithAuth(`/api/tenants/${tenantId}/members/${userId}/role`, {
+      method: 'PUT',
+      body: JSON.stringify(role),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update member role');
+    }
+    return response.json();
+  },
+
+  // Invitations
+  async sendInvitation(tenantId: string, email: string, role: TenantRole): Promise<TenantInvitationResponse> {
+    const response = await fetchWithAuth(`/api/tenants/${tenantId}/invitations`, {
+      method: 'POST',
+      body: JSON.stringify({ email, role }),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to send invitation');
+    }
+    return response.json();
+  },
+
+  async getPendingInvitations(tenantId: string): Promise<TenantInvitationResponse[]> {
+    const response = await fetchWithAuth(`/api/tenants/${tenantId}/invitations`);
+    if (!response.ok) throw new Error('Failed to fetch invitations');
+    return response.json();
+  },
+
+  async revokeInvitation(invitationId: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/tenants/invitations/${invitationId}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to revoke invitation');
+  },
+
+  async getInvitationByToken(token: string): Promise<TenantInvitationResponse | null> {
+    const response = await fetchWithAuth(`/api/tenants/invitations/token/${encodeURIComponent(token)}`);
+    if (response.status === 404) return null;
+    if (!response.ok) throw new Error('Failed to fetch invitation');
+    return response.json();
+  },
+
+  async acceptInvitation(token: string): Promise<TenantResponse> {
+    const response = await fetchWithAuth(`/api/tenants/invitations/token/${encodeURIComponent(token)}/accept`, {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to accept invitation');
+    }
+    return response.json();
+  },
+};
+
+// Contact API (public endpoint)
+export interface ContactRequest {
+  email: string;
+  message: string;
+}
+
+export const contactApi = {
+  async submit(data: ContactRequest): Promise<{ message: string }> {
+    const response = await fetch(`${API_BASE_URL}/api/contact`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      if (response.status === 429) {
+        throw new Error('Too many requests. Please wait a few minutes before trying again.');
+      }
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to send message');
     }
     return response.json();
   },

@@ -465,9 +465,9 @@ client.send(
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                                        Support
-                                    </a>
+                                    <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
+                                        Contact Us
+                                    </Link>
                                 </li>
                                 <li>
                                     <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">

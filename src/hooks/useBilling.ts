@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { billingApi } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 import type {
   CreateCheckoutRequest,
   ChangePlanRequest,
@@ -8,6 +9,7 @@ import type {
 } from '../lib/types';
 
 export function useBillingPlans() {
+  // Plans are global, not tenant-specific
   return useQuery({
     queryKey: ['billing', 'plans'],
     queryFn: () => billingApi.getPlans(),
@@ -15,30 +17,38 @@ export function useBillingPlans() {
 }
 
 export function useSubscription() {
+  const { tenantId } = useAuth();
   return useQuery({
-    queryKey: ['billing', 'subscription'],
+    queryKey: ['billing', 'subscription', tenantId],
     queryFn: () => billingApi.getSubscription(),
+    enabled: !!tenantId,
   });
 }
 
 export function useUsage() {
+  const { tenantId } = useAuth();
   return useQuery({
-    queryKey: ['billing', 'usage'],
+    queryKey: ['billing', 'usage', tenantId],
     queryFn: () => billingApi.getUsage(),
+    enabled: !!tenantId,
   });
 }
 
 export function useInvoices() {
+  const { tenantId } = useAuth();
   return useQuery({
-    queryKey: ['billing', 'invoices'],
+    queryKey: ['billing', 'invoices', tenantId],
     queryFn: () => billingApi.getInvoices(),
+    enabled: !!tenantId,
   });
 }
 
 export function usePlanLimits() {
+  const { tenantId } = useAuth();
   return useQuery({
-    queryKey: ['billing', 'limits'],
+    queryKey: ['billing', 'limits', tenantId],
     queryFn: () => billingApi.getLimits(),
+    enabled: !!tenantId,
   });
 }
 

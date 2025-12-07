@@ -1,19 +1,23 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { domainApi } from '../lib/api';
+import { useAuth } from '../contexts/AuthContext';
 import type { CreateDomainRequest } from '../lib/types';
 
 export function useDomains() {
+  const { tenantId } = useAuth();
   return useQuery({
-    queryKey: ['domains'],
+    queryKey: ['domains', tenantId],
     queryFn: () => domainApi.getAll(),
+    enabled: !!tenantId,
   });
 }
 
 export function useDomain(id: string) {
+  const { tenantId } = useAuth();
   return useQuery({
-    queryKey: ['domains', id],
+    queryKey: ['domains', tenantId, id],
     queryFn: () => domainApi.getById(id),
-    enabled: !!id,
+    enabled: !!id && !!tenantId,
   });
 }
 

@@ -1,8 +1,35 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { useMsal, useIsAuthenticated } from '@azure/msal-react';
-import { InteractionStatus } from '@azure/msal-browser';
+import { InteractionStatus, type AccountInfo } from '@azure/msal-browser';
 import { loginRequest } from '@/lib/authConfig';
-import { entraAuthApi, setInitializing, type TenantInfo } from '@/lib/api';
+import { entraAuthApi, setInitializing, setCurrentTenantId, type TenantInfo } from '@/lib/api';
+
+// Helper to extract email from account - handles various CIAM claim structures
+function extractEmailFromAccount(account: AccountInfo | undefined): string | null {
+  if (!account) return null;
+
+  const claims = account.idTokenClaims as {
+    email?: string;
+    emails?: string[];
+    preferred_username?: string;
+    signInNames?: { value: string }[];
+  } | undefined;
+
+  // Try various claim locations used by Entra External ID (CIAM)
+  if (claims?.emails?.[0]) return claims.emails[0];
+  if (claims?.email) return claims.email;
+  if (claims?.signInNames?.[0]?.value) return claims.signInNames[0].value;
+  if (claims?.preferred_username) return claims.preferred_username;
+
+  // Fallback: check if username looks like an email (not a GUID@tenant format)
+  const username = account.username;
+  if (username && username.includes('@') && !username.includes('.onmicrosoft.com')) {
+    return username;
+  }
+
+  // Last resort: use username even if it's the GUID format
+  return username || null;
+}
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -10,10 +37,12 @@ interface AuthContextType {
   userId: string | null;
   userName: string | null;
   tenantId: string | null;
+  currentTenant: TenantInfo | null;
   availableTenants: TenantInfo[];
   login: () => Promise<void>;
   logout: () => void;
   switchTenant: (tenantId: string) => Promise<void>;
+  setCurrentTenant: (tenant: TenantInfo | null) => void;
   isLoading: boolean;
   isInitialized: boolean;
   getAccessToken: () => Promise<string | null>;
@@ -30,13 +59,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialized, setIsInitialized] = useState(false);
   const [tenantId, setTenantId] = useState<string | null>(null);
+  const [currentTenant, setCurrentTenant] = useState<TenantInfo | null>(null);
   const [availableTenants, setAvailableTenants] = useState<TenantInfo[]>([]);
   const initializingRef = useRef(false);
 
   const account = accounts[0];
-  // For Entra External ID (CIAM), email is in idTokenClaims, not username
-  const idTokenClaims = account?.idTokenClaims as { email?: string; preferred_username?: string } | undefined;
-  const userEmail = idTokenClaims?.email || idTokenClaims?.preferred_username || account?.username || null;
+  const [resolvedEmail, setResolvedEmail] = useState<string | null>(null);
+
+  // Extract email - may need to fetch fresh token to get claims
+  useEffect(() => {
+    const resolveEmail = async () => {
+      if (!account) {
+        setResolvedEmail(null);
+        return;
+      }
+
+      // First try from existing account
+      let email = extractEmailFromAccount(account);
+
+      // If we only got a GUID-style username, try to get fresh claims via silent token request
+      if (email?.includes('.onmicrosoft.com') && inProgress === InteractionStatus.None) {
+        try {
+          const response = await instance.acquireTokenSilent({
+            ...loginRequest,
+            account,
+          });
+          if (response.account) {
+            email = extractEmailFromAccount(response.account);
+            if (import.meta.env.DEV) {
+              console.log('[Auth] Fresh token claims:', response.account.idTokenClaims);
+            }
+          }
+        } catch (e) {
+          // Silent acquisition failed, keep the fallback
+          console.warn('[Auth] Could not refresh claims:', e);
+        }
+      }
+
+      setResolvedEmail(email);
+    };
+
+    resolveEmail();
+  }, [account, instance, inProgress]);
+
+  const userEmail = resolvedEmail;
   const userId = account?.localAccountId || null;
   const userName = account?.name || null;
 
@@ -53,9 +119,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.log('Initializing user session with backend...');
         const response = await entraAuthApi.initialize();
         setTenantId(response.tenantId);
+        setCurrentTenantId(response.tenantId); // Update API module
         setAvailableTenants(response.availableTenants);
+        // Set current tenant from the response
+        const tenant = response.availableTenants.find(t => t.id === response.tenantId);
+        if (tenant) {
+          setCurrentTenant(tenant);
+        }
+        // Use email from backend if available (backend extracts from token claims)
+        if (response.email) {
+          setResolvedEmail(response.email);
+        }
         setIsInitialized(true);
-        console.log('User initialized:', response.isNewUser ? 'new user' : 'existing user');
+        console.log('User initialized:', response.isNewUser ? 'new user' : 'existing user', 'email:', response.email);
       } catch (error) {
         console.error('Failed to initialize user:', error);
         // Still mark as initialized to prevent infinite retries
@@ -88,6 +164,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = useCallback(() => {
     // Clear tenant state on logout
     setTenantId(null);
+    setCurrentTenantId(null); // Clear API module tenant
+    setCurrentTenant(null);
     setAvailableTenants([]);
     setIsInitialized(false);
     instance.logoutRedirect({
@@ -99,7 +177,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const response = await entraAuthApi.switchTenant(newTenantId);
       setTenantId(response.tenantId);
+      setCurrentTenantId(response.tenantId); // Update API module tenant
       setAvailableTenants(response.availableTenants);
+      // Update currentTenant
+      const tenant = response.availableTenants.find(t => t.id === response.tenantId);
+      if (tenant) {
+        setCurrentTenant(tenant);
+      }
     } catch (error) {
       console.error('Failed to switch tenant:', error);
       throw error;
@@ -146,10 +230,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       userId,
       userName,
       tenantId,
+      currentTenant,
       availableTenants,
       login,
       logout,
       switchTenant,
+      setCurrentTenant,
       isLoading,
       isInitialized,
       getAccessToken,
