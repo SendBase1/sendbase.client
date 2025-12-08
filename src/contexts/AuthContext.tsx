@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
 import { useMsal, useIsAuthenticated } from '@azure/msal-react';
 import { InteractionStatus, type AccountInfo } from '@azure/msal-browser';
-import { loginRequest } from '@/lib/authConfig';
+import { loginRequest, signUpRequest } from '@/lib/authConfig';
 import { entraAuthApi, setInitializing, setCurrentTenantId, type TenantInfo } from '@/lib/api';
 
 // Helper to extract email from account - handles various CIAM claim structures
@@ -40,6 +40,7 @@ interface AuthContextType {
   currentTenant: TenantInfo | null;
   availableTenants: TenantInfo[];
   login: () => Promise<void>;
+  signUp: () => Promise<void>;
   logout: () => void;
   switchTenant: (tenantId: string) => Promise<void>;
   setCurrentTenant: (tenant: TenantInfo | null) => void;
@@ -161,6 +162,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [instance]);
 
+  const signUp = useCallback(async () => {
+    try {
+      await instance.loginRedirect(signUpRequest);
+    } catch (error) {
+      console.error('Sign up error:', error);
+      throw error;
+    }
+  }, [instance]);
+
   const logout = useCallback(() => {
     // Clear tenant state on logout
     setTenantId(null);
@@ -233,6 +243,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       currentTenant,
       availableTenants,
       login,
+      signUp,
       logout,
       switchTenant,
       setCurrentTenant,

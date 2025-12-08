@@ -3,8 +3,8 @@ import { type Configuration, LogLevel, PublicClientApplication, EventType, type 
 // MSAL configuration for Entra External ID
 export const msalConfig: Configuration = {
   auth: {
-    clientId: import.meta.env.VITE_ENTRA_CLIENT_ID || 'df64e57e-1fd7-43bf-ace5-c920d556e0cc',
-    authority: import.meta.env.VITE_ENTRA_AUTHORITY || 'https://EmailCustomers.ciamlogin.com',
+    clientId: import.meta.env.VITE_ENTRA_CLIENT_ID || '5be94389-7652-416d-ae0b-f2094e04d8b9',
+    authority: import.meta.env.VITE_ENTRA_AUTHORITY || 'https://sendbasecustomers.ciamlogin.com',
     redirectUri: window.location.origin,
     postLogoutRedirectUri: window.location.origin,
     navigateToLoginRequestUrl: false, // Don't navigate, let React Router handle it
@@ -42,6 +42,12 @@ export const msalConfig: Configuration = {
 // Scopes for API access - for CIAM, use openid scopes
 export const loginRequest = {
   scopes: ['openid', 'profile', 'email'],
+};
+
+// Sign-up request with prompt hint
+export const signUpRequest = {
+  scopes: ['openid', 'profile', 'email'],
+  prompt: 'create' as const, // Hint to show sign-up flow
 };
 
 // Create MSAL instance

@@ -9,7 +9,7 @@ import { RedirectingToLogin, ProcessingLogin } from './components/AuthTransition
 function SignIn() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { login, isAuthenticated, isLoading } = useAuth();
+    const { login, signUp, isAuthenticated, isLoading } = useAuth();
     const [isRedirecting, setIsRedirecting] = useState(false);
 
     // Get the page they tried to visit before being redirected to login
@@ -30,6 +30,18 @@ function SignIn() {
             await login();
         } catch (error) {
             console.error('Sign in error:', error);
+            setIsRedirecting(false);
+        }
+    };
+
+    const handleSignUp = async () => {
+        try {
+            setIsRedirecting(true);
+            // Small delay to show the transition screen
+            await new Promise(resolve => setTimeout(resolve, 800));
+            await signUp();
+        } catch (error) {
+            console.error('Sign up error:', error);
             setIsRedirecting(false);
         }
     };
@@ -77,12 +89,32 @@ function SignIn() {
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <Button
-                            onClick={handleSignIn}
+                            onClick={handleSignUp}
                             className="w-full"
                             size="lg"
                         >
                             <Mail className="w-4 h-4 mr-2" />
-                            Sign in with Microsoft
+                            Create Account
+                        </Button>
+
+                        <div className="relative">
+                            <div className="absolute inset-0 flex items-center">
+                                <span className="w-full border-t" />
+                            </div>
+                            <div className="relative flex justify-center text-xs uppercase">
+                                <span className="bg-background px-2 text-muted-foreground">
+                                    Already have an account?
+                                </span>
+                            </div>
+                        </div>
+
+                        <Button
+                            onClick={handleSignIn}
+                            variant="outline"
+                            className="w-full"
+                            size="lg"
+                        >
+                            Sign In
                         </Button>
 
                         <p className="text-xs text-center text-muted-foreground">
