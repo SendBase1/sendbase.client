@@ -30,6 +30,11 @@ import type {
   TenantMemberResponse,
   TenantInvitationResponse,
   TenantResponse,
+  TemplateResponse,
+  TemplateListResponse,
+  CreateTemplateRequest,
+  UpdateTemplateRequest,
+  RenderedTemplate,
 } from './types';
 import { API_BASE_URL } from './config';
 import { triggerLogout } from '../contexts/AuthContext';
@@ -573,6 +578,61 @@ export const contactApi = {
       const error = await response.json();
       throw new Error(error.error || 'Failed to send message');
     }
+    return response.json();
+  },
+};
+
+// Template API
+export const templateApi = {
+  async getAll(): Promise<TemplateListResponse[]> {
+    const response = await fetchWithAuth('/api/v1/templates');
+    if (!response.ok) throw new Error('Failed to fetch templates');
+    return response.json();
+  },
+
+  async getById(id: string): Promise<TemplateResponse> {
+    const response = await fetchWithAuth(`/api/v1/templates/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch template');
+    return response.json();
+  },
+
+  async create(data: CreateTemplateRequest): Promise<TemplateResponse> {
+    const response = await fetchWithAuth('/api/v1/templates', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create template');
+    }
+    return response.json();
+  },
+
+  async update(id: string, data: UpdateTemplateRequest): Promise<TemplateResponse> {
+    const response = await fetchWithAuth(`/api/v1/templates/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update template');
+    }
+    return response.json();
+  },
+
+  async delete(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/templates/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete template');
+  },
+
+  async preview(id: string, variables?: Record<string, string>): Promise<RenderedTemplate> {
+    const response = await fetchWithAuth(`/api/v1/templates/${id}/preview`, {
+      method: 'POST',
+      body: JSON.stringify(variables || {}),
+    });
+    if (!response.ok) throw new Error('Failed to preview template');
     return response.json();
   },
 };

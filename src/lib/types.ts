@@ -335,3 +335,44 @@ export interface TenantInvitationResponse {
   expires_at_utc: string;
   token?: string; // Only present on create
 }
+
+// Template Types
+
+export interface TemplateResponse {
+  id: string;
+  name: string;
+  version: number;
+  subject?: string;
+  html_body?: string;
+  text_body?: string;
+  variables: string[];
+  created_at_utc: string;
+}
+
+export interface TemplateListResponse {
+  id: string;
+  name: string;
+  version: number;
+  subject?: string;
+  created_at_utc: string;
+}
+
+export interface CreateTemplateRequest {
+  name: string;
+  subject?: string;
+  html_body?: string;
+  text_body?: string;
+}
+
+export interface UpdateTemplateRequest {
+  name?: string;
+  subject?: string;
+  html_body?: string;
+  text_body?: string;
+}
+
+export interface RenderedTemplate {
+  subject?: string;
+  html_body?: string;
+  text_body?: string;
+}

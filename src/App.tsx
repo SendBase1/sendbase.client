@@ -30,6 +30,8 @@ const ContactPage = lazy(() => import('./pages/Contact').then(m => ({ default: m
 const BillingPage = lazy(() => import('./pages/Billing/BillingPage').then(m => ({ default: m.BillingPage })));
 const AcceptInvitationPage = lazy(() => import('./pages/AcceptInvitation/AcceptInvitationPage').then(m => ({ default: m.AcceptInvitationPage })));
 const SettingsPage = lazy(() => import('./pages/Settings/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const TemplatesPage = lazy(() => import('./pages/Templates').then(m => ({ default: m.TemplatesPage })));
+const TemplateDetailsPage = lazy(() => import('./pages/Templates').then(m => ({ default: m.TemplateDetailsPage })));
 
 const queryClient = new QueryClient();
 
@@ -90,6 +92,8 @@ function App() {
                                     <Route path="/apikeys" element={<ApiKeysPage />} />
                                     <Route path="/webhooks" element={<WebhooksPage />} />
                                     <Route path="/webhooks/:id" element={<WebhookDetailsPage />} />
+                                    <Route path="/templates" element={<TemplatesPage />} />
+                                    <Route path="/templates/:id" element={<TemplateDetailsPage />} />
                                     <Route path="/settings" element={<SettingsPage />} />
                                     <Route path="/billing" element={<BillingPage />} />
                                     <Route path="/profile" element={<ProfilePage />} />

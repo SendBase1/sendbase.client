@@ -18,6 +18,7 @@ import {
   CreditCard,
   Settings,
   HelpCircle,
+  FileText,
 } from 'lucide-react';
 
 export function AppLayout() {
@@ -30,6 +31,7 @@ export function AppLayout() {
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/domains', label: 'Domains', icon: Database },
+    { path: '/templates', label: 'Templates', icon: FileText },
     { path: '/send', label: 'Send', icon: Send },
     { path: '/messages', label: 'Messages', icon: MessageSquare },
     { path: '/apikeys', label: 'API Keys', icon: Key },
