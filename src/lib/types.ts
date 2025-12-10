@@ -35,6 +35,7 @@ export interface MessageResponse {
   ses_message_id?: string;
   status: number;
   status_text: string;
+  scheduled_at_utc?: string;
   requested_at_utc: string;
   sent_at_utc?: string;
   error?: string;
@@ -93,6 +94,7 @@ export interface SendEmailRequest {
   html_body?: string;
   text_body?: string;
   tags?: Record<string, string>;
+  scheduled_at_utc?: string;
 }
 
 export interface PaginatedResponse<T> {
@@ -375,4 +377,68 @@ export interface RenderedTemplate {
   subject?: string;
   html_body?: string;
   text_body?: string;
+}
+
+// Email API - Batch and List Types
+
+export interface SendBatchEmailRequest {
+  emails: SendEmailRequest[];
+}
+
+export interface BatchEmailResponse {
+  batch_id: string;
+  total: number;
+  succeeded: number;
+  failed: number;
+  results: BatchEmailItemResult[];
+}
+
+export interface BatchEmailItemResult {
+  index: number;
+  success: boolean;
+  message_id?: string;
+  error?: string;
+}
+
+export interface ListEmailsParams {
+  page?: number;
+  page_size?: number;
+  status?: number;
+  from_email?: string;
+  to_email?: string;
+  since?: string;
+  until?: string;
+  sort_by?: 'requested_at' | 'sent_at' | 'subject';
+  sort_order?: 'asc' | 'desc';
+}
+
+export interface EmailListResponse {
+  items: MessageResponse[];
+  total_count: number;
+  page: number;
+  page_size: number;
+  has_more: boolean;
+}
+
+export interface UpdateScheduledEmailRequest {
+  subject?: string;
+  html_body?: string;
+  text_body?: string;
+  scheduled_at_utc?: string;
+  tags?: Record<string, string>;
+}
+
+export interface AttachmentResponse {
+  id: number;
+  file_name: string;
+  content_type: string;
+  size_bytes: number;
+  is_inline: boolean;
+  content_id?: string;
+  uploaded_at_utc: string;
+}
+
+export interface AttachmentDownloadResponse {
+  download_url: string;
+  expires_at_utc: string;
 }

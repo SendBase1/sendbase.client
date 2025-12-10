@@ -20,8 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
-import { RefreshCw, Search, ChevronLeft, ChevronRight, ExternalLink, Mail } from 'lucide-react';
+import { RefreshCw, Search, ChevronLeft, ChevronRight, ExternalLink, Mail, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { formatDate } from '../../lib/utils';
 
 export function MessagesPage() {
   const navigate = useNavigate();
@@ -38,6 +39,7 @@ export function MessagesPage() {
       Delivered: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/20',
       Pending: 'bg-yellow-500/15 text-yellow-500 border-yellow-500/20',
       Queued: 'bg-blue-500/15 text-blue-500 border-blue-500/20',
+      Scheduled: 'bg-purple-500/15 text-purple-500 border-purple-500/20',
       Failed: 'bg-red-500/15 text-red-400 border-red-500/20',
       Bounced: 'bg-orange-500/15 text-orange-400 border-orange-500/20',
       Complained: 'bg-red-500/15 text-red-400 border-red-500/20',
@@ -111,6 +113,7 @@ export function MessagesPage() {
               <SelectContent>
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="Scheduled">Scheduled</SelectItem>
                 <SelectItem value="Sent">Sent</SelectItem>
                 <SelectItem value="Delivered">Delivered</SelectItem>
                 <SelectItem value="Bounced">Bounced</SelectItem>
@@ -178,11 +181,21 @@ export function MessagesPage() {
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          {message.sent_at_utc ? (
+                          {message.scheduled_at_utc && !message.sent_at_utc ? (
+                            <>
+                              <div className="flex items-center gap-1 text-purple-500">
+                                <Clock className="h-3 w-3" />
+                                {formatDistanceToNow(new Date(message.scheduled_at_utc), { addSuffix: true })}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {formatDate(message.scheduled_at_utc)}
+                              </div>
+                            </>
+                          ) : message.sent_at_utc ? (
                             <>
                               <div>{formatDistanceToNow(new Date(message.sent_at_utc), { addSuffix: true })}</div>
                               <div className="text-xs text-muted-foreground">
-                                {new Date(message.sent_at_utc).toLocaleDateString()}
+                                {formatDate(message.sent_at_utc)}
                               </div>
                             </>
                           ) : (

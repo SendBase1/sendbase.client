@@ -54,6 +54,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 // Event for cross-tab logout and API 401 handling
 const AUTH_LOGOUT_EVENT = 'auth:logout';
 
+// localStorage key for persisting the last selected workspace
+const LAST_WORKSPACE_KEY = 'email_last_workspace_id';
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { instance, accounts, inProgress } = useMsal();
   const isAuthenticated = useIsAuthenticated();
@@ -118,7 +121,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setInitializing(true); // Prevent 401 from triggering logout during init
       try {
         console.log('Initializing user session with backend...');
-        const response = await entraAuthApi.initialize();
+        // Get last used workspace from localStorage
+        const lastWorkspaceId = localStorage.getItem(LAST_WORKSPACE_KEY) || undefined;
+        const response = await entraAuthApi.initialize(lastWorkspaceId);
         setTenantId(response.tenantId);
         setCurrentTenantId(response.tenantId); // Update API module
         setAvailableTenants(response.availableTenants);
@@ -126,6 +131,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const tenant = response.availableTenants.find(t => t.id === response.tenantId);
         if (tenant) {
           setCurrentTenant(tenant);
+          // Save to localStorage for next session
+          localStorage.setItem(LAST_WORKSPACE_KEY, response.tenantId);
         }
         // Use email from backend if available (backend extracts from token claims)
         if (response.email) {
@@ -194,6 +201,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (tenant) {
         setCurrentTenant(tenant);
       }
+      // Save to localStorage for next session
+      localStorage.setItem(LAST_WORKSPACE_KEY, response.tenantId);
     } catch (error) {
       console.error('Failed to switch tenant:', error);
       throw error;

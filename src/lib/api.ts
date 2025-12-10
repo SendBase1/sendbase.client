@@ -35,6 +35,13 @@ import type {
   CreateTemplateRequest,
   UpdateTemplateRequest,
   RenderedTemplate,
+  SendBatchEmailRequest,
+  BatchEmailResponse,
+  ListEmailsParams,
+  EmailListResponse,
+  UpdateScheduledEmailRequest,
+  AttachmentResponse,
+  AttachmentDownloadResponse,
 } from './types';
 import { API_BASE_URL } from './config';
 import { triggerLogout } from '../contexts/AuthContext';
@@ -180,6 +187,79 @@ export const emailApi = {
       const error = await response.json();
       throw new Error(error.error || 'Failed to send email');
     }
+    return response.json();
+  },
+
+  async sendBatch(data: SendBatchEmailRequest): Promise<BatchEmailResponse> {
+    const response = await fetchWithAuth('/api/v1/emails/batch', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to send batch emails');
+    }
+    return response.json();
+  },
+
+  async list(params: ListEmailsParams = {}): Promise<EmailListResponse> {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.set('page', params.page.toString());
+    if (params.page_size) queryParams.set('page_size', params.page_size.toString());
+    if (params.status !== undefined) queryParams.set('status', params.status.toString());
+    if (params.from_email) queryParams.set('from_email', params.from_email);
+    if (params.to_email) queryParams.set('to_email', params.to_email);
+    if (params.since) queryParams.set('since', params.since);
+    if (params.until) queryParams.set('until', params.until);
+    if (params.sort_by) queryParams.set('sort_by', params.sort_by);
+    if (params.sort_order) queryParams.set('sort_order', params.sort_order);
+
+    const queryString = queryParams.toString();
+    const url = `/api/v1/emails${queryString ? `?${queryString}` : ''}`;
+
+    const response = await fetchWithAuth(url);
+    if (!response.ok) throw new Error('Failed to list emails');
+    return response.json();
+  },
+
+  async getById(id: string): Promise<MessageResponse> {
+    const response = await fetchWithAuth(`/api/v1/emails/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch email');
+    return response.json();
+  },
+
+  async update(id: string, data: UpdateScheduledEmailRequest): Promise<MessageResponse> {
+    const response = await fetchWithAuth(`/api/v1/emails/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update email');
+    }
+    return response.json();
+  },
+
+  async cancel(id: string): Promise<{ message: string }> {
+    const response = await fetchWithAuth(`/api/v1/emails/${id}/cancel`, {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to cancel email');
+    }
+    return response.json();
+  },
+
+  async listAttachments(emailId: string): Promise<AttachmentResponse[]> {
+    const response = await fetchWithAuth(`/api/v1/emails/${emailId}/attachments`);
+    if (!response.ok) throw new Error('Failed to list attachments');
+    return response.json();
+  },
+
+  async getAttachmentUrl(emailId: string, attachmentId: number): Promise<AttachmentDownloadResponse> {
+    const response = await fetchWithAuth(`/api/v1/emails/${emailId}/attachments/${attachmentId}`);
+    if (!response.ok) throw new Error('Failed to get attachment URL');
     return response.json();
   },
 };
@@ -405,9 +485,10 @@ export const billingApi = {
 
 // Entra Auth API
 export const entraAuthApi = {
-  async initialize(): Promise<InitializeUserResponse> {
+  async initialize(preferredTenantId?: string): Promise<InitializeUserResponse> {
     const response = await fetchWithAuth('/api/entraauth/initialize', {
       method: 'POST',
+      body: JSON.stringify(preferredTenantId ? { preferredTenantId } : {}),
     });
     if (!response.ok) {
       const error = await response.json();

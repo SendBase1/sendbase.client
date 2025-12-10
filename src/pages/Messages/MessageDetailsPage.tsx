@@ -11,8 +11,9 @@ import {
   TableHeader,
   TableRow,
 } from '../../components/ui/table';
-import { ArrowLeft, RefreshCw, AlertCircle, Clock, CheckCircle2, XCircle, Mail } from 'lucide-react';
+import { ArrowLeft, RefreshCw, AlertCircle, Clock, CheckCircle2, XCircle, Mail, Calendar } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { formatDateTime, getTimezoneAbbreviation } from '../../lib/utils';
 
 export function MessageDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -25,6 +26,7 @@ export function MessageDetailsPage() {
       Delivered: 'bg-emerald-500/15 text-emerald-500 border-emerald-500/20',
       Pending: 'bg-yellow-500/15 text-yellow-500 border-yellow-500/20',
       Queued: 'bg-blue-500/15 text-blue-500 border-blue-500/20',
+      Scheduled: 'bg-purple-500/15 text-purple-500 border-purple-500/20',
       Failed: 'bg-red-500/15 text-red-400 border-red-500/20',
       Bounced: 'bg-orange-500/15 text-orange-400 border-orange-500/20',
       Complained: 'bg-red-500/15 text-red-400 border-red-500/20',
@@ -141,18 +143,36 @@ export function MessageDetailsPage() {
             <div>
               <dt className="text-sm font-medium text-muted-foreground mb-1">Requested At</dt>
               <dd className="text-sm">
-                {new Date(message.requested_at_utc).toLocaleString()}
+                {formatDateTime(message.requested_at_utc)}
+                <span className="text-muted-foreground ml-1">({getTimezoneAbbreviation()})</span>
                 <span className="text-muted-foreground ml-2">
                   ({formatDistanceToNow(new Date(message.requested_at_utc), { addSuffix: true })})
                 </span>
               </dd>
             </div>
 
+            {message.scheduled_at_utc && (
+              <div>
+                <dt className="text-sm font-medium text-muted-foreground mb-1 flex items-center gap-1">
+                  <Calendar className="h-3.5 w-3.5" />
+                  Scheduled For
+                </dt>
+                <dd className="text-sm">
+                  {formatDateTime(message.scheduled_at_utc)}
+                  <span className="text-muted-foreground ml-1">({getTimezoneAbbreviation()})</span>
+                  <span className="text-muted-foreground ml-2">
+                    ({formatDistanceToNow(new Date(message.scheduled_at_utc), { addSuffix: true })})
+                  </span>
+                </dd>
+              </div>
+            )}
+
             {message.sent_at_utc && (
               <div>
                 <dt className="text-sm font-medium text-muted-foreground mb-1">Sent At</dt>
                 <dd className="text-sm">
-                  {new Date(message.sent_at_utc).toLocaleString()}
+                  {formatDateTime(message.sent_at_utc)}
+                  <span className="text-muted-foreground ml-1">({getTimezoneAbbreviation()})</span>
                   <span className="text-muted-foreground ml-2">
                     ({formatDistanceToNow(new Date(message.sent_at_utc), { addSuffix: true })})
                   </span>
@@ -268,7 +288,7 @@ export function MessageDetailsPage() {
                           )}
                         </div>
                         <div className="text-sm text-muted-foreground text-right">
-                          <div>{new Date(event.occurred_at_utc).toLocaleString()}</div>
+                          <div>{formatDateTime(event.occurred_at_utc)}</div>
                           <div className="text-xs">
                             {formatDistanceToNow(new Date(event.occurred_at_utc), { addSuffix: true })}
                           </div>

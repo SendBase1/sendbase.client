@@ -68,6 +68,8 @@ export function WorkspaceSwitcher() {
         id: response.tenantId,
         name: response.tenantName,
       });
+      // Save to localStorage for next session
+      localStorage.setItem('email_last_workspace_id', response.tenantId);
       // Refresh all queries to load data for new tenant
       queryClient.invalidateQueries();
       setOpen(false);
