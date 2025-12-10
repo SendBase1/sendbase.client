@@ -13,6 +13,9 @@ export interface DomainResponse {
   identity_arn?: string;
   created_at_utc: string;
   verified_at_utc?: string;
+  inbound_enabled: boolean;
+  inbound_status: number;
+  inbound_status_text: string;
   dns_records: DnsRecordResponse[];
 }
 
@@ -300,6 +303,35 @@ export interface CreatePortalSessionRequest {
 
 export interface CancelSubscriptionRequest {
   cancelImmediately: boolean;
+}
+
+// Inbound Email Types
+
+export interface InboundMessageResponse {
+  id: string;
+  domain_id?: string;
+  domain_name?: string;
+  recipient: string;
+  from_address: string;
+  subject?: string;
+  received_at_utc: string;
+  size_bytes?: number;
+  region: string;
+  ses_message_id?: string;
+  processed_at_utc?: string;
+}
+
+export interface InboundMessageListResponse {
+  items: InboundMessageResponse[];
+  total_count: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+}
+
+export interface InboundEmailDownloadResponse {
+  download_url: string;
+  expires_at_utc: string;
 }
 
 // Tenant Types

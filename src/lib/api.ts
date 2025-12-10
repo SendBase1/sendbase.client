@@ -42,6 +42,9 @@ import type {
   UpdateScheduledEmailRequest,
   AttachmentResponse,
   AttachmentDownloadResponse,
+  InboundMessageResponse,
+  InboundMessageListResponse,
+  InboundEmailDownloadResponse,
 } from './types';
 import { API_BASE_URL } from './config';
 import { triggerLogout } from '../contexts/AuthContext';
@@ -173,6 +176,28 @@ export const domainApi = {
       method: 'DELETE',
     });
     if (!response.ok) throw new Error('Failed to delete domain');
+  },
+
+  async enableInbound(id: string): Promise<DomainResponse> {
+    const response = await fetchWithAuth(`/api/v1/domains/${id}/inbound/enable`, {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to enable inbound email');
+    }
+    return response.json();
+  },
+
+  async disableInbound(id: string): Promise<DomainResponse> {
+    const response = await fetchWithAuth(`/api/v1/domains/${id}/inbound/disable`, {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to disable inbound email');
+    }
+    return response.json();
   },
 };
 
@@ -480,6 +505,40 @@ export const billingApi = {
       throw new Error(error.message || 'Failed to create portal session');
     }
     return response.json();
+  },
+};
+
+// Inbound Email API
+export const inboundApi = {
+  async getAll(page = 1, pageSize = 50, domainId?: string): Promise<InboundMessageListResponse> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      pageSize: pageSize.toString(),
+    });
+    if (domainId) params.append('domainId', domainId);
+
+    const response = await fetchWithAuth(`/api/v1/inbound?${params}`);
+    if (!response.ok) throw new Error('Failed to fetch inbound messages');
+    return response.json();
+  },
+
+  async getById(id: string): Promise<InboundMessageResponse> {
+    const response = await fetchWithAuth(`/api/v1/inbound/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch inbound message');
+    return response.json();
+  },
+
+  async getRawUrl(id: string): Promise<InboundEmailDownloadResponse> {
+    const response = await fetchWithAuth(`/api/v1/inbound/${id}/raw`);
+    if (!response.ok) throw new Error('Failed to get raw email URL');
+    return response.json();
+  },
+
+  async delete(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/inbound/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete inbound message');
   },
 };
 
