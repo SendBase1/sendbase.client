@@ -345,7 +345,7 @@ export function DomainsPage() {
         open={domainToDelete !== null}
         onOpenChange={(open) => !open && setDomainToDelete(null)}
         title="Delete Domain"
-        description={`This will permanently delete the domain and remove it from AWS SES. This action cannot be undone.`}
+        description={`This will permanently delete the domain. All API keys associated with this domain will also be deleted. This action cannot be undone.`}
         confirmText={domainToDelete?.domain ?? ''}
         confirmLabel="Type the domain name to confirm"
         onConfirm={handleDeleteDomain}

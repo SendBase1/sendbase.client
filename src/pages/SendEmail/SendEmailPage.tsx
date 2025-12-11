@@ -18,9 +18,11 @@ import {
 } from '../../components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../../components/ui/tabs';
 import { Alert, AlertDescription } from '../../components/ui/alert';
-import { Plus, X, Send, Mail, AlertCircle } from 'lucide-react';
+import { Switch } from '../../components/ui/switch';
+import { Plus, X, Send, Mail, AlertCircle, Clock, Calendar } from 'lucide-react';
 import { toast } from 'sonner';
 import type { SendEmailRequest } from '../../lib/types';
+import { getTimezoneAbbreviation } from '../../lib/utils';
 
 const recipientSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -36,14 +38,31 @@ const sendEmailSchema = z.object({
   subject: z.string().min(1, 'Subject is required'),
   html_body: z.string().optional(),
   text_body: z.string().optional(),
+  scheduled_at: z.string().optional(),
 });
 
 type SendEmailFormData = z.infer<typeof sendEmailSchema>;
+
+// Get minimum datetime for scheduling (5 minutes from now)
+function getMinScheduleDateTime(): string {
+  const now = new Date();
+  now.setMinutes(now.getMinutes() + 5);
+  return now.toISOString().slice(0, 16);
+}
+
+// Get default schedule datetime (1 hour from now, rounded to nearest 15 min)
+function getDefaultScheduleDateTime(): string {
+  const now = new Date();
+  now.setHours(now.getHours() + 1);
+  now.setMinutes(Math.ceil(now.getMinutes() / 15) * 15, 0, 0);
+  return now.toISOString().slice(0, 16);
+}
 
 export function SendEmailPage() {
   const { data: domains } = useDomains();
   const sendEmail = useSendEmail();
   const [selectedDomain, setSelectedDomain] = useState<string>('');
+  const [isScheduled, setIsScheduled] = useState(false);
 
   const {
     register,
@@ -59,6 +78,7 @@ export function SendEmailPage() {
       to: [{ email: '', name: '' }],
       cc: [],
       bcc: [],
+      scheduled_at: getDefaultScheduleDateTime(),
     },
   });
 
@@ -93,15 +113,32 @@ export function SendEmailPage() {
 
   const onSubmit = async (data: SendEmailFormData) => {
     try {
+      // Convert local datetime to UTC ISO string if scheduling
+      let scheduledAtUtc: string | undefined;
+      if (isScheduled && data.scheduled_at) {
+        const localDate = new Date(data.scheduled_at);
+        scheduledAtUtc = localDate.toISOString();
+      }
+
       const cleanedData: SendEmailRequest = {
-        ...data,
+        from_email: data.from_email,
+        from_name: data.from_name,
         to: data.to.filter(r => r.email),
         cc: data.cc?.filter(r => r.email),
         bcc: data.bcc?.filter(r => r.email),
+        subject: data.subject,
+        html_body: data.html_body,
+        text_body: data.text_body,
+        scheduled_at_utc: scheduledAtUtc,
       };
 
       const result = await sendEmail.mutateAsync(cleanedData);
-      toast.success(`Email sent successfully! Message ID: ${result.message_id}`);
+
+      if (isScheduled) {
+        toast.success(`Email scheduled successfully! Message ID: ${result.message_id}`);
+      } else {
+        toast.success(`Email sent successfully! Message ID: ${result.message_id}`);
+      }
 
       reset({
         to: [{ email: '', name: '' }],
@@ -110,10 +147,13 @@ export function SendEmailPage() {
         subject: '',
         html_body: '',
         text_body: '',
+        scheduled_at: getDefaultScheduleDateTime(),
       });
       setSelectedDomain('');
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to send email');
+      setIsScheduled(false);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to send email';
+      toast.error(errorMessage);
     }
   };
 
@@ -384,6 +424,52 @@ export function SendEmailPage() {
           </CardContent>
         </Card>
 
+        {/* Scheduling Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Delivery Options
+            </CardTitle>
+            <CardDescription>Send immediately or schedule for later</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label htmlFor="schedule-toggle" className="text-base">Schedule for later</Label>
+                <p className="text-sm text-muted-foreground">
+                  {isScheduled ? 'Email will be sent at the scheduled time' : 'Email will be sent immediately'}
+                </p>
+              </div>
+              <Switch
+                id="schedule-toggle"
+                checked={isScheduled}
+                onCheckedChange={setIsScheduled}
+              />
+            </div>
+
+            {isScheduled && (
+              <div className="space-y-2 pt-2 border-t">
+                <Label htmlFor="scheduled_at" className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4" />
+                  Schedule Date & Time
+                  <span className="text-xs font-normal text-muted-foreground">({getTimezoneAbbreviation()})</span>
+                </Label>
+                <Input
+                  id="scheduled_at"
+                  type="datetime-local"
+                  min={getMinScheduleDateTime()}
+                  {...register('scheduled_at')}
+                  className="max-w-xs"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Select when you want the email to be sent in your local timezone
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Submit Button */}
         <div className="flex items-center justify-between">
           <div className="text-sm text-muted-foreground">
@@ -391,6 +477,11 @@ export function SendEmailPage() {
               <span className="text-destructive flex items-center gap-2">
                 <Mail className="h-4 w-4" />
                 No verified domains available
+              </span>
+            ) : isScheduled ? (
+              <span className="flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Email will be scheduled from {verifiedDomains.length} verified domain(s)
               </span>
             ) : (
               <span className="flex items-center gap-2">
@@ -405,7 +496,12 @@ export function SendEmailPage() {
             size="lg"
           >
             {sendEmail.isPending ? (
-              'Sending...'
+              isScheduled ? 'Scheduling...' : 'Sending...'
+            ) : isScheduled ? (
+              <>
+                <Clock className="h-4 w-4 mr-2" />
+                Schedule Email
+              </>
             ) : (
               <>
                 <Send className="h-4 w-4 mr-2" />

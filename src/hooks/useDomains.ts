@@ -54,3 +54,27 @@ export function useDeleteDomain() {
     },
   });
 }
+
+export function useEnableInbound() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => domainApi.enableInbound(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['domains'] });
+      queryClient.invalidateQueries({ queryKey: ['domains', data.id] });
+    },
+  });
+}
+
+export function useDisableInbound() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: string) => domainApi.disableInbound(id),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['domains'] });
+      queryClient.invalidateQueries({ queryKey: ['domains', data.id] });
+    },
+  });
+}

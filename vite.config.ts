@@ -1,34 +1,34 @@
 import { fileURLToPath, URL } from 'node:url';
 
-import { defineConfig } from 'vite';
+import { defineConfig, type ServerOptions } from 'vite';
 import react from '@vitejs/plugin-react';
 import fs from 'fs';
 import path from 'path';
 import child_process from 'child_process';
 import { env } from 'process';
 
-// Only setup certificates in development mode
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
+    env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:7220';
 
-let certFilePath = '';
-let keyFilePath = '';
-
-if (isDevelopment) {
+// Setup certificates for HTTPS in development
+function getServerConfig(): ServerOptions | undefined {
+    // Only setup certificates when running dev server (not during build)
     const baseFolder =
         env.APPDATA !== undefined && env.APPDATA !== ''
             ? `${env.APPDATA}/ASP.NET/https`
             : `${env.HOME}/.aspnet/https`;
 
     const certificateName = "email.client";
-    certFilePath = path.join(baseFolder, `${certificateName}.pem`);
-    keyFilePath = path.join(baseFolder, `${certificateName}.key`);
+    const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
+    const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
 
+    // Check if certs exist, if not try to create them
     if (!fs.existsSync(baseFolder)) {
         fs.mkdirSync(baseFolder, { recursive: true });
     }
 
     if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
-        if (0 !== child_process.spawnSync('dotnet', [
+        const result = child_process.spawnSync('dotnet', [
             'dev-certs',
             'https',
             '--export-path',
@@ -36,17 +36,36 @@ if (isDevelopment) {
             '--format',
             'Pem',
             '--no-password',
-        ], { stdio: 'inherit', }).status) {
-            throw new Error("Could not create certificate.");
+        ], { stdio: 'inherit' });
+
+        if (result.status !== 0) {
+            console.warn("Could not create certificate, falling back to HTTP");
+            return {
+                proxy: {
+                    '^/weatherforecast': { target, secure: false },
+                    '^/api': { target, secure: false }
+                },
+                port: parseInt(env.DEV_SERVER_PORT || '59592'),
+            };
         }
     }
+
+    return {
+        proxy: {
+            '^/weatherforecast': { target, secure: false },
+            '^/api': { target, secure: false }
+        },
+        port: parseInt(env.DEV_SERVER_PORT || '59592'),
+        https: {
+            key: fs.readFileSync(keyFilePath),
+            cert: fs.readFileSync(certFilePath),
+        },
+    };
 }
 
-const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
-    env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:7220';
-
 // https://vitejs.dev/config/
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+    appType: 'spa',
     plugins: [react()],
     resolve: {
         alias: {
@@ -69,21 +88,10 @@ export default defineConfig({
             }
         }
     },
-    server: isDevelopment ? {
-        proxy: {
-            '^/weatherforecast': {
-                target,
-                secure: false
-            },
-            '^/api': {
-                target,
-                secure: false
-            }
-        },
+    // Server config only needed for dev command
+    server: command === 'serve' ? getServerConfig() : undefined,
+    // Preview server config (for npm run preview)
+    preview: {
         port: parseInt(env.DEV_SERVER_PORT || '59592'),
-        https: {
-            key: fs.readFileSync(keyFilePath),
-            cert: fs.readFileSync(certFilePath),
-        }
-    } : undefined
-})
+    }
+}))

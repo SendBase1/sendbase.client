@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDomain, useVerifyDomain } from '../../hooks/useDomains';
+import { useDomain, useVerifyDomain, useEnableInbound, useDisableInbound } from '../../hooks/useDomains';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Card, CardContent } from '../../components/ui/card';
+import { Switch } from '../../components/ui/switch';
 import {
   Table,
   TableBody,
@@ -11,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../components/ui/table';
-import { ArrowLeft, RefreshCw, Copy, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Copy, CheckCircle2, AlertCircle, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState } from 'react';
 
@@ -20,7 +21,24 @@ export function DomainDetailsPage() {
   const navigate = useNavigate();
   const { data: domain, isLoading } = useDomain(id!);
   const verifyDomain = useVerifyDomain();
+  const enableInbound = useEnableInbound();
+  const disableInbound = useDisableInbound();
   const [copiedRecord, setCopiedRecord] = useState<number | null>(null);
+
+  const handleToggleInbound = async () => {
+    if (!id) return;
+    try {
+      if (domain?.inbound_enabled) {
+        await disableInbound.mutateAsync(id);
+        toast.success('Inbound email receiving disabled');
+      } else {
+        await enableInbound.mutateAsync(id);
+        toast.success('Inbound email receiving enabled');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update inbound settings');
+    }
+  };
 
   const handleVerifyDomain = async () => {
     if (!id) return;
@@ -115,7 +133,7 @@ export function DomainDetailsPage() {
       </div>
 
       {/* Status Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -155,6 +173,27 @@ export function DomainDetailsPage() {
               <code className="text-sm bg-muted px-2 py-1 rounded">
                 {domain.region}
               </code>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Receive Emails</p>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">
+                    {domain.inbound_enabled ? 'Enabled' : 'Disabled'}
+                  </span>
+                </div>
+              </div>
+              <Switch
+                checked={domain.inbound_enabled}
+                onCheckedChange={handleToggleInbound}
+                disabled={enableInbound.isPending || disableInbound.isPending || !isVerified}
+              />
             </div>
           </CardContent>
         </Card>
@@ -207,6 +246,7 @@ export function DomainDetailsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Type</TableHead>
+              <TableHead>Purpose</TableHead>
               <TableHead>Host/Name</TableHead>
               <TableHead>Value</TableHead>
               <TableHead>Status</TableHead>
@@ -215,66 +255,77 @@ export function DomainDetailsPage() {
           </TableHeader>
           <TableBody>
             {domain.dns_records && domain.dns_records.length > 0 ? (
-              domain.dns_records.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell>
-                    <code className="text-xs bg-muted px-2 py-1 rounded font-mono">
-                      {record.record_type}
-                    </code>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <code className="text-xs bg-muted px-2 py-1 rounded font-mono max-w-xs truncate">
-                        {record.host}
+              domain.dns_records.map((record) => {
+                const purpose = record.record_type === 'MX' ? 'Receiving' : 'Sending';
+                const purposeColor = record.record_type === 'MX'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-green-100 text-green-800';
+                return (
+                  <TableRow key={record.id}>
+                    <TableCell>
+                      <code className="text-xs bg-muted px-2 py-1 rounded font-mono">
+                        {record.record_type}
                       </code>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(record.host, record.id * 2)}
-                        className="h-6 w-6 p-0"
-                      >
-                        {copiedRecord === record.id * 2 ? (
-                          <CheckCircle2 className="h-3 w-3 text-green-600" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <code className="text-xs bg-muted px-2 py-1 rounded font-mono max-w-md truncate">
-                        {record.value}
-                      </code>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(record.value, record.id * 2 + 1)}
-                        className="h-6 w-6 p-0"
-                      >
-                        {copiedRecord === record.id * 2 + 1 ? (
-                          <CheckCircle2 className="h-3 w-3 text-green-600" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(record.status, record.status_text)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {record.required && (
-                      <Badge variant="outline" className="text-xs">
-                        Required
-                      </Badge>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                    <TableCell>
+                      <span className={`text-xs px-2 py-1 rounded ${purposeColor}`}>
+                        {purpose}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <code className="text-xs bg-muted px-2 py-1 rounded font-mono max-w-xs truncate">
+                          {record.host}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(record.host, record.id * 2)}
+                          className="h-6 w-6 p-0"
+                        >
+                          {copiedRecord === record.id * 2 ? (
+                            <CheckCircle2 className="h-3 w-3 text-green-600" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <code className="text-xs bg-muted px-2 py-1 rounded font-mono max-w-md truncate">
+                          {record.value}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(record.value, record.id * 2 + 1)}
+                          className="h-6 w-6 p-0"
+                        >
+                          {copiedRecord === record.id * 2 + 1 ? (
+                            <CheckCircle2 className="h-3 w-3 text-green-600" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(record.status, record.status_text)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {record.required && (
+                        <Badge variant="outline" className="text-xs">
+                          Required
+                        </Badge>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   No DNS records found
                 </TableCell>
               </TableRow>
