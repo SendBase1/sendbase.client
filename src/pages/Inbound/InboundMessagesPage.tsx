@@ -27,7 +27,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../../components/ui/dialog';
-import { RefreshCw, Search, ChevronLeft, ChevronRight, Download, Trash2, Inbox } from 'lucide-react';
+import { RefreshCw, Search, ChevronLeft, ChevronRight, Download, Trash2, Inbox, Paperclip } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { formatDate } from '../../lib/utils';
 import { inboundApi } from '../../lib/api';
@@ -44,17 +44,16 @@ export function InboundMessagesPage() {
   const { data: messagesData, isLoading, refetch } = useInboundMessages(page, pageSize);
   const deleteMessage = useDeleteInboundMessage();
 
-  const filteredMessages = messagesData?.items?.filter((message) => {
+  const filteredMessages = messagesData?.data?.filter((message) => {
     const matchesSearch = searchTerm === '' ||
-      message.from_address?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      message.from?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       message.subject?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      message.recipient?.toLowerCase().includes(searchTerm.toLowerCase());
+      message.to?.some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
 
     return matchesSearch;
   }) || [];
 
-  const totalPages = messagesData ? Math.ceil(messagesData.total_count / pageSize) : 1;
-  const hasNextPage = page < totalPages;
+  const hasMore = messagesData?.has_more ?? false;
   const hasPrevPage = page > 1;
 
   const handleDownloadRaw = async (messageId: string) => {
@@ -137,7 +136,7 @@ export function InboundMessagesPage() {
                     <TableHead>To</TableHead>
                     <TableHead>Subject</TableHead>
                     <TableHead>Received</TableHead>
-                    <TableHead>Size</TableHead>
+                    <TableHead>Attachments</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -150,12 +149,12 @@ export function InboundMessagesPage() {
                     >
                       <TableCell>
                         <div className="font-medium max-w-[200px] truncate">
-                          {message.from_address || <span className="text-muted-foreground italic">Unknown</span>}
+                          {message.from || <span className="text-muted-foreground italic">Unknown</span>}
                         </div>
                       </TableCell>
                       <TableCell>
                         <div className="max-w-[200px] truncate">
-                          {message.recipient}
+                          {message.to?.join(', ') || '-'}
                         </div>
                       </TableCell>
                       <TableCell>
@@ -165,16 +164,17 @@ export function InboundMessagesPage() {
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          <div>{formatDistanceToNow(new Date(message.received_at_utc), { addSuffix: true })}</div>
+                          <div>{formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}</div>
                           <div className="text-xs text-muted-foreground">
-                            {formatDate(message.received_at_utc)}
+                            {formatDate(message.created_at)}
                           </div>
                         </div>
                       </TableCell>
                       <TableCell>
-                        {message.size_bytes ? (
+                        {message.attachments && message.attachments.length > 0 ? (
                           <Badge variant="outline" className="font-mono">
-                            {formatBytes(message.size_bytes)}
+                            <Paperclip className="h-3 w-3 mr-1" />
+                            {message.attachments.length}
                           </Badge>
                         ) : (
                           <span className="text-muted-foreground">-</span>
@@ -215,7 +215,7 @@ export function InboundMessagesPage() {
             <CardContent className="flex items-center justify-between p-4">
               <div className="flex items-center gap-4">
                 <div className="text-sm text-muted-foreground">
-                  Showing {((page - 1) * pageSize) + 1} to {Math.min(page * pageSize, messagesData?.total_count || 0)} of {messagesData?.total_count || 0} messages
+                  Page {page}
                 </div>
                 <Select value={pageSize.toString()} onValueChange={(val) => {
                   setPageSize(Number(val));
@@ -244,17 +244,11 @@ export function InboundMessagesPage() {
                   Previous
                 </Button>
 
-                <div className="flex items-center gap-1 px-3">
-                  <span className="text-sm">
-                    Page {page} of {totalPages}
-                  </span>
-                </div>
-
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setPage(p => p + 1)}
-                  disabled={!hasNextPage}
+                  disabled={!hasMore}
                 >
                   Next
                   <ChevronRight className="h-4 w-4 ml-1" />
@@ -294,27 +288,55 @@ export function InboundMessagesPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">From</div>
-                  <div className="mt-1">{selectedMessage.from_address || 'Unknown'}</div>
+                  <div className="mt-1">{selectedMessage.from || 'Unknown'}</div>
                 </div>
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">To</div>
-                  <div className="mt-1">{selectedMessage.recipient}</div>
+                  <div className="mt-1">{selectedMessage.to?.join(', ') || '-'}</div>
                 </div>
+                {selectedMessage.cc && selectedMessage.cc.length > 0 && (
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">CC</div>
+                    <div className="mt-1">{selectedMessage.cc.join(', ')}</div>
+                  </div>
+                )}
+                {selectedMessage.reply_to && selectedMessage.reply_to.length > 0 && (
+                  <div>
+                    <div className="text-sm font-medium text-muted-foreground">Reply-To</div>
+                    <div className="mt-1">{selectedMessage.reply_to.join(', ')}</div>
+                  </div>
+                )}
                 <div>
                   <div className="text-sm font-medium text-muted-foreground">Received</div>
-                  <div className="mt-1">{formatDate(selectedMessage.received_at_utc)}</div>
+                  <div className="mt-1">{formatDate(selectedMessage.created_at)}</div>
                 </div>
-                <div>
-                  <div className="text-sm font-medium text-muted-foreground">Size</div>
-                  <div className="mt-1">{selectedMessage.size_bytes ? formatBytes(selectedMessage.size_bytes) : '-'}</div>
-                </div>
-                {selectedMessage.ses_message_id && (
+                {selectedMessage.message_id && (
                   <div className="col-span-2">
-                    <div className="text-sm font-medium text-muted-foreground">SES Message ID</div>
-                    <div className="mt-1 font-mono text-xs break-all">{selectedMessage.ses_message_id}</div>
+                    <div className="text-sm font-medium text-muted-foreground">Message ID</div>
+                    <div className="mt-1 font-mono text-xs break-all">{selectedMessage.message_id}</div>
                   </div>
                 )}
               </div>
+
+              {/* Attachments */}
+              {selectedMessage.attachments && selectedMessage.attachments.length > 0 && (
+                <div>
+                  <div className="text-sm font-medium text-muted-foreground mb-2">Attachments</div>
+                  <div className="space-y-2">
+                    {selectedMessage.attachments.map((attachment) => (
+                      <div key={attachment.id} className="flex items-center justify-between p-2 bg-muted rounded">
+                        <div className="flex items-center gap-2">
+                          <Paperclip className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm">{attachment.filename}</span>
+                          <Badge variant="outline" className="text-xs">
+                            {formatBytes(attachment.size)}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <DialogFooter>
                 <Button
