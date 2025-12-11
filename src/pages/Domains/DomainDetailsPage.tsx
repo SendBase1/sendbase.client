@@ -1,8 +1,9 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useDomain, useVerifyDomain } from '../../hooks/useDomains';
+import { useDomain, useVerifyDomain, useEnableInbound, useDisableInbound } from '../../hooks/useDomains';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Card, CardContent } from '../../components/ui/card';
+import { Switch } from '../../components/ui/switch';
 import {
   Table,
   TableBody,
@@ -11,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '../../components/ui/table';
-import { ArrowLeft, RefreshCw, Copy, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ArrowLeft, RefreshCw, Copy, CheckCircle2, AlertCircle, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 import { useState } from 'react';
 
@@ -20,7 +21,24 @@ export function DomainDetailsPage() {
   const navigate = useNavigate();
   const { data: domain, isLoading } = useDomain(id!);
   const verifyDomain = useVerifyDomain();
+  const enableInbound = useEnableInbound();
+  const disableInbound = useDisableInbound();
   const [copiedRecord, setCopiedRecord] = useState<number | null>(null);
+
+  const handleToggleInbound = async () => {
+    if (!id) return;
+    try {
+      if (domain?.inbound_enabled) {
+        await disableInbound.mutateAsync(id);
+        toast.success('Inbound email receiving disabled');
+      } else {
+        await enableInbound.mutateAsync(id);
+        toast.success('Inbound email receiving enabled');
+      }
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to update inbound settings');
+    }
+  };
 
   const handleVerifyDomain = async () => {
     if (!id) return;
@@ -115,7 +133,7 @@ export function DomainDetailsPage() {
       </div>
 
       {/* Status Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -155,6 +173,27 @@ export function DomainDetailsPage() {
               <code className="text-sm bg-muted px-2 py-1 rounded">
                 {domain.region}
               </code>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Receive Emails</p>
+                <div className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-sm">
+                    {domain.inbound_enabled ? 'Enabled' : 'Disabled'}
+                  </span>
+                </div>
+              </div>
+              <Switch
+                checked={domain.inbound_enabled}
+                onCheckedChange={handleToggleInbound}
+                disabled={enableInbound.isPending || disableInbound.isPending || !isVerified}
+              />
             </div>
           </CardContent>
         </Card>
