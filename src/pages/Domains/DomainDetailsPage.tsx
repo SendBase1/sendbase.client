@@ -207,6 +207,7 @@ export function DomainDetailsPage() {
           <TableHeader>
             <TableRow>
               <TableHead>Type</TableHead>
+              <TableHead>Purpose</TableHead>
               <TableHead>Host/Name</TableHead>
               <TableHead>Value</TableHead>
               <TableHead>Status</TableHead>
@@ -215,66 +216,77 @@ export function DomainDetailsPage() {
           </TableHeader>
           <TableBody>
             {domain.dns_records && domain.dns_records.length > 0 ? (
-              domain.dns_records.map((record) => (
-                <TableRow key={record.id}>
-                  <TableCell>
-                    <code className="text-xs bg-muted px-2 py-1 rounded font-mono">
-                      {record.record_type}
-                    </code>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <code className="text-xs bg-muted px-2 py-1 rounded font-mono max-w-xs truncate">
-                        {record.host}
+              domain.dns_records.map((record) => {
+                const purpose = record.record_type === 'MX' ? 'Receiving' : 'Sending';
+                const purposeColor = record.record_type === 'MX'
+                  ? 'bg-blue-100 text-blue-800'
+                  : 'bg-green-100 text-green-800';
+                return (
+                  <TableRow key={record.id}>
+                    <TableCell>
+                      <code className="text-xs bg-muted px-2 py-1 rounded font-mono">
+                        {record.record_type}
                       </code>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(record.host, record.id * 2)}
-                        className="h-6 w-6 p-0"
-                      >
-                        {copiedRecord === record.id * 2 ? (
-                          <CheckCircle2 className="h-3 w-3 text-green-600" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      <code className="text-xs bg-muted px-2 py-1 rounded font-mono max-w-md truncate">
-                        {record.value}
-                      </code>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(record.value, record.id * 2 + 1)}
-                        className="h-6 w-6 p-0"
-                      >
-                        {copiedRecord === record.id * 2 + 1 ? (
-                          <CheckCircle2 className="h-3 w-3 text-green-600" />
-                        ) : (
-                          <Copy className="h-3 w-3" />
-                        )}
-                      </Button>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(record.status, record.status_text)}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {record.required && (
-                      <Badge variant="outline" className="text-xs">
-                        Required
-                      </Badge>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
+                    </TableCell>
+                    <TableCell>
+                      <span className={`text-xs px-2 py-1 rounded ${purposeColor}`}>
+                        {purpose}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <code className="text-xs bg-muted px-2 py-1 rounded font-mono max-w-xs truncate">
+                          {record.host}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(record.host, record.id * 2)}
+                          className="h-6 w-6 p-0"
+                        >
+                          {copiedRecord === record.id * 2 ? (
+                            <CheckCircle2 className="h-3 w-3 text-green-600" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <code className="text-xs bg-muted px-2 py-1 rounded font-mono max-w-md truncate">
+                          {record.value}
+                        </code>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => copyToClipboard(record.value, record.id * 2 + 1)}
+                          className="h-6 w-6 p-0"
+                        >
+                          {copiedRecord === record.id * 2 + 1 ? (
+                            <CheckCircle2 className="h-3 w-3 text-green-600" />
+                          ) : (
+                            <Copy className="h-3 w-3" />
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {getStatusBadge(record.status, record.status_text)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {record.required && (
+                        <Badge variant="outline" className="text-xs">
+                          Required
+                        </Badge>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })
             ) : (
               <TableRow>
-                <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
                   No DNS records found
                 </TableCell>
               </TableRow>
