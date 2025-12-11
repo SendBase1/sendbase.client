@@ -307,26 +307,32 @@ export interface CancelSubscriptionRequest {
 
 // Inbound Email Types
 
+export interface InboundAttachmentResponse {
+  id: string;
+  filename: string;
+  content_type: string;
+  content_id?: string;
+  content_disposition: string;
+  size: number;
+}
+
 export interface InboundMessageResponse {
   id: string;
-  domain_id?: string;
-  domain_name?: string;
-  recipient: string;
-  from_address: string;
+  to: string[];
+  from: string;
+  created_at: string;
   subject?: string;
-  received_at_utc: string;
-  size_bytes?: number;
-  region: string;
-  ses_message_id?: string;
-  processed_at_utc?: string;
+  bcc: string[];
+  cc: string[];
+  reply_to: string[];
+  message_id?: string;
+  attachments: InboundAttachmentResponse[];
 }
 
 export interface InboundMessageListResponse {
-  items: InboundMessageResponse[];
-  total_count: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
+  object: string;
+  has_more: boolean;
+  data: InboundMessageResponse[];
 }
 
 export interface InboundEmailDownloadResponse {
