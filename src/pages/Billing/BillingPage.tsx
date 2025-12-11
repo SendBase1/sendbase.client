@@ -467,7 +467,7 @@ export function BillingPage() {
                       variant="outline"
                       asChild
                     >
-                      <a href="mailto:sales@socialhq.app?subject=Enterprise Plan Inquiry">
+                      <a href="mailto:sales@sendbase.app?subject=Enterprise Plan Inquiry">
                         Contact Sales
                       </a>
                     </Button>

@@ -139,7 +139,7 @@ export function PrivacyPolicy() {
                 <li><strong>Restriction:</strong> Request restriction of processing</li>
               </ul>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                To exercise these rights, please contact us at privacy@socialhq.app.
+                To exercise these rights, please contact us at privacy@sendbase.app.
               </p>
             </section>
 
@@ -177,7 +177,7 @@ export function PrivacyPolicy() {
                 If you have questions about this Privacy Policy or our data practices, please contact us at:
               </p>
               <p className="text-muted-foreground leading-relaxed mt-4">
-                Email: privacy@socialhq.app
+                Email: privacy@sendbase.app
               </p>
             </section>
           </CardContent>

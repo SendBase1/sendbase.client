@@ -22,7 +22,7 @@ The application uses environment variables for configuration. These are managed 
 2. Update `.env.local` with your values:
    ```env
    VITE_API_BASE_URL=https://localhost:7220
-   VITE_APP_DOMAIN=yourdomain.com
+   VITE_APP_DOMAIN=sendbase.app
    ```
 
 3. Restart the dev server:
@@ -39,15 +39,15 @@ The application uses environment variables for configuration. These are managed 
 - **Default**: `https://localhost:7220`
 - **Examples**:
   - Local development: `https://localhost:7220`
-  - Staging: `https://api-staging.yourdomain.com`
-  - Production: `https://api.yourdomain.com`
+  - Staging: `https://api-staging.sendbase.app`
+  - Production: `https://api.sendbase.app`
 
 #### `VITE_APP_DOMAIN`
 - **Description**: Your application domain (used in marketing site code examples)
-- **Default**: `yourdomain.com`
+- **Default**: `sendbase.app`
 - **Examples**:
   - Local: `localhost:59592`
-  - Production: `yourdomain.com`
+  - Production: `sendbase.app`
 
 ### Feature Flags
 
@@ -115,15 +115,15 @@ VITE_ENABLE_DEBUG=true
 
 ### Staging
 ```env
-VITE_API_BASE_URL=https://api-staging.yourdomain.com
-VITE_APP_DOMAIN=staging.yourdomain.com
+VITE_API_BASE_URL=https://api-staging.sendbase.app
+VITE_APP_DOMAIN=staging.sendbase.app
 VITE_ENABLE_DEBUG=true
 ```
 
 ### Production
 ```env
-VITE_API_BASE_URL=https://api.yourdomain.com
-VITE_APP_DOMAIN=yourdomain.com
+VITE_API_BASE_URL=https://api.sendbase.app
+VITE_APP_DOMAIN=sendbase.app
 VITE_ENABLE_DEBUG=false
 ```
 

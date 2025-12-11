@@ -22,24 +22,24 @@ function Home() {
     }, [isAuthenticated, isLoading, navigate]);
 
     // Use a clean display URL for code examples (not the actual API URL)
-    const exampleApiUrl = 'https://api.socialhq.app';
+    const exampleApiUrl = 'https://api.sendbase.app';
 
     const codeExamples = {
         curl: `curl -X POST '${exampleApiUrl}/v1/emails/send' \\
   -H 'Authorization: Bearer YOUR_API_KEY' \\
   -H 'Content-Type: application/json' \\
   -d '{
-    "from": "hello@yourdomain.com",
+    "from": "hello@sendbase.app",
     "to": ["customer@example.com"],
     "subject": "Welcome!",
     "html": "<h1>Hello World</h1>"
   }'`,
-        node: `import { EmailClient } from '@yourdomain/email';
+        node: `import { EmailClient } from '@sendbase/email';
 
 const client = new EmailClient('YOUR_API_KEY');
 
 await client.send({
-  from: 'hello@yourdomain.com',
+  from: 'hello@sendbase.app',
   to: ['customer@example.com'],
   subject: 'Welcome!',
   html: '<h1>Hello World</h1>'
@@ -49,7 +49,7 @@ await client.send({
 client = EmailClient('YOUR_API_KEY')
 
 client.send(
-    from_email='hello@yourdomain.com',
+    from_email='hello@sendbase.app',
     to=['customer@example.com'],
     subject='Welcome!',
     html='<h1>Hello World</h1>'
@@ -380,7 +380,7 @@ client.send(
                                 </li>
                             </ul>
                         </div>
-                        <a href="mailto:sales@socialhq.app?subject=Enterprise Plan Inquiry" className="mt-6">
+                        <a href="mailto:sales@sendbase.app?subject=Enterprise Plan Inquiry" className="mt-6">
                             <Button variant="outline" className="w-full">
                                 Contact Sales
                             </Button>

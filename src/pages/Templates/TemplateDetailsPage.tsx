@@ -150,7 +150,7 @@ export function TemplateDetailsPage() {
 --header 'x-api-key: YOUR_API_KEY' \\
 --header 'Content-Type: application/json' \\
 --data '{
-    "from_email": "you@yourdomain.com",
+    "from_email": "you@sendbase.app",
     "to": [{"email": "recipient@example.com"}],
     "subject": "${subjectExample.replace(/"/g, '\\"')}",
     "template_id": "${id}",
@@ -165,7 +165,7 @@ export function TemplateDetailsPage() {
     'Content-Type': 'application/json',
   },
   body: JSON.stringify({
-    from_email: 'you@yourdomain.com',
+    from_email: 'you@sendbase.app',
     to: [{ email: 'recipient@example.com' }],
     subject: '${subjectExample.replace(/'/g, "\\'")}',
     template_id: '${id}',
@@ -182,7 +182,7 @@ client.DefaultRequestHeaders.Add("x-api-key", "YOUR_API_KEY");
 
 var request = new
 {
-    from_email = "you@yourdomain.com",
+    from_email = "you@sendbase.app",
     to = new[] { new { email = "recipient@example.com" } },
     subject = "${subjectExample.replace(/"/g, '\\"')}",
     template_id = "${id}",

@@ -44,8 +44,8 @@ export function ContactPage() {
   };
 
   const contactEmails = [
-    { label: 'General inquiries', email: 'support@socialhq.app' },
-    { label: 'Report security concerns', email: 'security@socialhq.app' },
+    { label: 'General inquiries', email: 'support@sendbase.app' },
+    { label: 'Report security concerns', email: 'security@sendbase.app' },
   ];
 
   if (isSuccess) {

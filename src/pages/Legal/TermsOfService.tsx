@@ -132,7 +132,7 @@ export function TermsOfService() {
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4">13. Contact Information</h2>
               <p className="text-muted-foreground leading-relaxed">
-                If you have any questions about these Terms, please contact us at legal@socialhq.app.
+                If you have any questions about these Terms, please contact us at legal@sendbase.app.
               </p>
             </section>
           </CardContent>

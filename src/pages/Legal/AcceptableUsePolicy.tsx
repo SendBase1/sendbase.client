@@ -161,7 +161,7 @@ export function AcceptableUsePolicy() {
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4">10. Reporting Violations</h2>
               <p className="text-muted-foreground leading-relaxed">
-                If you receive spam or abusive emails sent through our Service, or become aware of any violations of this policy, please report it to abuse@socialhq.app. Include the full email headers and any relevant information.
+                If you receive spam or abusive emails sent through our Service, or become aware of any violations of this policy, please report it to abuse@sendbase.app. Include the full email headers and any relevant information.
               </p>
             </section>
 
@@ -178,8 +178,8 @@ export function AcceptableUsePolicy() {
                 For questions about this policy, contact us at:
               </p>
               <ul className="list-none pl-0 text-muted-foreground space-y-1 mt-4">
-                <li>General inquiries: support@socialhq.app</li>
-                <li>Abuse reports: abuse@socialhq.app</li>
+                <li>General inquiries: support@sendbase.app</li>
+                <li>Abuse reports: abuse@sendbase.app</li>
               </ul>
             </section>
           </CardContent>

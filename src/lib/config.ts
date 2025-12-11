@@ -9,7 +9,7 @@ export const config = {
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'https://localhost:7220',
 
   // App domain (for marketing site examples, etc.)
-  appDomain: import.meta.env.VITE_APP_DOMAIN || 'yourdomain.com',
+  appDomain: import.meta.env.VITE_APP_DOMAIN || 'sendbase.app',
 
   // Feature flags
   features: {
