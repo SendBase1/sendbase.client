@@ -32,6 +32,7 @@ const AcceptInvitationPage = lazy(() => import('./pages/AcceptInvitation/AcceptI
 const SettingsPage = lazy(() => import('./pages/Settings/SettingsPage').then(m => ({ default: m.SettingsPage })));
 const TemplatesPage = lazy(() => import('./pages/Templates').then(m => ({ default: m.TemplatesPage })));
 const TemplateDetailsPage = lazy(() => import('./pages/Templates').then(m => ({ default: m.TemplateDetailsPage })));
+const InboundMessagesPage = lazy(() => import('./pages/Inbound/InboundMessagesPage').then(m => ({ default: m.InboundMessagesPage })));
 
 const queryClient = new QueryClient();
 
@@ -89,6 +90,7 @@ function App() {
                                     <Route path="/send" element={<SendEmailPage />} />
                                     <Route path="/messages" element={<MessagesPage />} />
                                     <Route path="/messages/:id" element={<MessageDetailsPage />} />
+                                    <Route path="/inbound" element={<InboundMessagesPage />} />
                                     <Route path="/apikeys" element={<ApiKeysPage />} />
                                     <Route path="/webhooks" element={<WebhooksPage />} />
                                     <Route path="/webhooks/:id" element={<WebhookDetailsPage />} />

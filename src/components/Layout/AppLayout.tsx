@@ -19,6 +19,7 @@ import {
   Settings,
   HelpCircle,
   FileText,
+  Inbox,
 } from 'lucide-react';
 
 export function AppLayout() {
@@ -34,6 +35,7 @@ export function AppLayout() {
     { path: '/templates', label: 'Templates', icon: FileText },
     { path: '/send', label: 'Send', icon: Send },
     { path: '/messages', label: 'Messages', icon: MessageSquare },
+    { path: '/inbound', label: 'Inbound', icon: Inbox },
     { path: '/apikeys', label: 'API Keys', icon: Key },
     { path: '/webhooks', label: 'Webhooks', icon: Webhook },
     { path: '/settings', label: 'Settings', icon: Settings },
