@@ -29,7 +29,7 @@ import {
 } from '../../components/ui/dialog';
 import { RefreshCw, Search, ChevronLeft, ChevronRight, Download, Trash2, Inbox, Paperclip } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { formatDate } from '../../lib/utils';
+import { formatDate, parseUtcDate } from '../../lib/utils';
 import { inboundApi } from '../../lib/api';
 import type { InboundMessageResponse } from '../../lib/types';
 
@@ -164,7 +164,7 @@ export function InboundMessagesPage() {
                       </TableCell>
                       <TableCell>
                         <div className="text-sm">
-                          <div>{formatDistanceToNow(new Date(message.created_at), { addSuffix: true })}</div>
+                          <div>{formatDistanceToNow(parseUtcDate(message.created_at), { addSuffix: true })}</div>
                           <div className="text-xs text-muted-foreground">
                             {formatDate(message.created_at)}
                           </div>

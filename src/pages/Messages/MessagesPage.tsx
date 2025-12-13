@@ -22,7 +22,7 @@ import {
 } from '../../components/ui/select';
 import { RefreshCw, Search, ChevronLeft, ChevronRight, ExternalLink, Mail, Clock } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { formatDate } from '../../lib/utils';
+import { formatDate, parseUtcDate } from '../../lib/utils';
 
 export function MessagesPage() {
   const navigate = useNavigate();
@@ -185,7 +185,7 @@ export function MessagesPage() {
                             <>
                               <div className="flex items-center gap-1 text-purple-500">
                                 <Clock className="h-3 w-3" />
-                                {formatDistanceToNow(new Date(message.scheduled_at_utc), { addSuffix: true })}
+                                {formatDistanceToNow(parseUtcDate(message.scheduled_at_utc), { addSuffix: true })}
                               </div>
                               <div className="text-xs text-muted-foreground">
                                 {formatDate(message.scheduled_at_utc)}
@@ -193,7 +193,7 @@ export function MessagesPage() {
                             </>
                           ) : message.sent_at_utc ? (
                             <>
-                              <div>{formatDistanceToNow(new Date(message.sent_at_utc), { addSuffix: true })}</div>
+                              <div>{formatDistanceToNow(parseUtcDate(message.sent_at_utc), { addSuffix: true })}</div>
                               <div className="text-xs text-muted-foreground">
                                 {formatDate(message.sent_at_utc)}
                               </div>

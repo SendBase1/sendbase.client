@@ -13,7 +13,7 @@ import {
 } from '../../components/ui/table';
 import { ArrowLeft, RefreshCw, AlertCircle, Clock, CheckCircle2, XCircle, Mail, Calendar } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
-import { formatDateTime, getTimezoneAbbreviation } from '../../lib/utils';
+import { formatDateTime, getTimezoneAbbreviation, parseUtcDate } from '../../lib/utils';
 
 export function MessageDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -146,7 +146,7 @@ export function MessageDetailsPage() {
                 {formatDateTime(message.requested_at_utc)}
                 <span className="text-muted-foreground ml-1">({getTimezoneAbbreviation()})</span>
                 <span className="text-muted-foreground ml-2">
-                  ({formatDistanceToNow(new Date(message.requested_at_utc), { addSuffix: true })})
+                  ({formatDistanceToNow(parseUtcDate(message.requested_at_utc), { addSuffix: true })})
                 </span>
               </dd>
             </div>
@@ -161,7 +161,7 @@ export function MessageDetailsPage() {
                   {formatDateTime(message.scheduled_at_utc)}
                   <span className="text-muted-foreground ml-1">({getTimezoneAbbreviation()})</span>
                   <span className="text-muted-foreground ml-2">
-                    ({formatDistanceToNow(new Date(message.scheduled_at_utc), { addSuffix: true })})
+                    ({formatDistanceToNow(parseUtcDate(message.scheduled_at_utc), { addSuffix: true })})
                   </span>
                 </dd>
               </div>
@@ -174,7 +174,7 @@ export function MessageDetailsPage() {
                   {formatDateTime(message.sent_at_utc)}
                   <span className="text-muted-foreground ml-1">({getTimezoneAbbreviation()})</span>
                   <span className="text-muted-foreground ml-2">
-                    ({formatDistanceToNow(new Date(message.sent_at_utc), { addSuffix: true })})
+                    ({formatDistanceToNow(parseUtcDate(message.sent_at_utc), { addSuffix: true })})
                   </span>
                 </dd>
               </div>
@@ -290,7 +290,7 @@ export function MessageDetailsPage() {
                         <div className="text-sm text-muted-foreground text-right">
                           <div>{formatDateTime(event.occurred_at_utc)}</div>
                           <div className="text-xs">
-                            {formatDistanceToNow(new Date(event.occurred_at_utc), { addSuffix: true })}
+                            {formatDistanceToNow(parseUtcDate(event.occurred_at_utc), { addSuffix: true })}
                           </div>
                         </div>
                       </div>

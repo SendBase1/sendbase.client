@@ -24,6 +24,7 @@ import {
   Shield
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { parseUtcDate } from './lib/utils';
 
 function Dashboard() {
     const navigate = useNavigate();
@@ -272,7 +273,7 @@ function Dashboard() {
                                         </TableCell>
                                         <TableCell className="text-xs text-muted-foreground">
                                             {message.sent_at_utc
-                                                ? formatDistanceToNow(new Date(message.sent_at_utc), { addSuffix: true })
+                                                ? formatDistanceToNow(parseUtcDate(message.sent_at_utc), { addSuffix: true })
                                                 : 'Not sent'}
                                         </TableCell>
                                     </TableRow>
