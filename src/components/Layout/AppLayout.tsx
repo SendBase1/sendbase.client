@@ -52,7 +52,7 @@ export function AppLayout() {
           <div className="border-b px-4 py-3 lg:px-6">
             <Link to="/dashboard" className="flex items-center gap-2 font-semibold mb-3">
               <Mail className="h-6 w-6" />
-              <span>EmailAPI</span>
+              <span>Sendbase</span>
             </Link>
             <WorkspaceSwitcher />
           </div>
