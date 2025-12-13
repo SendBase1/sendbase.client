@@ -63,7 +63,7 @@ function SignIn() {
                 <div className="container mx-auto flex h-14 max-w-7xl items-center px-4 md:px-6">
                     <Link to="/" className="flex items-center space-x-2">
                         <Mail className="h-6 w-6" />
-                        <span className="font-bold">EmailAPI</span>
+                        <span className="font-bold">Sendbase</span>
                     </Link>
                     <div className="flex flex-1 items-center justify-end">
                         <Link to="/">
@@ -81,7 +81,7 @@ function SignIn() {
                 <Card className="w-full max-w-md">
                     <CardHeader className="space-y-1 text-center">
                         <CardTitle className="text-2xl font-bold">
-                            Welcome to EmailAPI
+                            Welcome to Sendbase
                         </CardTitle>
                         <CardDescription>
                             Sign in or create an account to get started
