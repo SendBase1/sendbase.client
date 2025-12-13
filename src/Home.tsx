@@ -85,7 +85,7 @@ $client->emails->send([
                     <div className="mr-4 flex">
                         <Link to="/" className="mr-6 flex items-center space-x-2">
                             <Mail className="h-6 w-6" />
-                            <span className="font-bold">EmailAPI</span>
+                            <span className="font-bold">Sendbase</span>
                         </Link>
                     </div>
                     <div className="flex flex-1 items-center justify-between space-x-2 md:justify-end">
@@ -116,7 +116,7 @@ $client->emails->send([
                     <div className="flex flex-col items-center text-center space-y-8">
                         <div className="space-y-4 max-w-[64rem]">
                             <h1 className="font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
-                                Email for developers
+                                Sendbase for developers
                             </h1>
                             <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8 mx-auto">
                                 The best way to reach humans instead of spam folders. Deliver transactional and marketing emails at scale.
@@ -535,10 +535,10 @@ $client->emails->send([
                     <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 md:flex-row">
                         <div className="flex items-center gap-2">
                             <Mail className="h-5 w-5" />
-                            <span className="font-bold">EmailAPI</span>
+                            <span className="font-bold">Sendbase</span>
                         </div>
                         <p className="text-center text-sm text-muted-foreground">
-                            &copy; 2025 EmailAPI. All rights reserved.
+                            &copy; 2025 Sendbase. All rights reserved.
                         </p>
                     </div>
                 </div>
