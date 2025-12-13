@@ -10,7 +10,7 @@ import { useAuth } from './contexts/AuthContext';
 
 function Home() {
     const { theme, setTheme } = useTheme();
-    const [activeTab, setActiveTab] = useState<'curl' | 'node' | 'python'>('curl');
+    const [activeTab, setActiveTab] = useState<'curl' | 'node' | 'python' | 'dotnet' | 'php'>('curl');
     const { isAuthenticated, isLoading } = useAuth();
     const navigate = useNavigate();
 
@@ -53,7 +53,28 @@ client.emails.send(
     to=['customer@example.com'],
     subject='Welcome!',
     html_body='<h1>Hello World</h1>'
-)`
+)`,
+        dotnet: `using SendBase.Email;
+
+var client = new SendBaseClient("YOUR_API_KEY");
+
+await client.Emails.SendAsync(new SendEmailRequest
+{
+    FromEmail = "hello@sendbase.app",
+    To = new List<string> { "customer@example.com" },
+    Subject = "Welcome!",
+    HtmlBody = "<h1>Hello World</h1>"
+});`,
+        php: `require_once('vendor/autoload.php');
+
+$client = new SendBase\\Email\\SendBaseClient('YOUR_API_KEY');
+
+$client->emails->send([
+    'from_email' => 'hello@sendbase.app',
+    'to' => ['customer@example.com'],
+    'subject' => 'Welcome!',
+    'html_body' => '<h1>Hello World</h1>'
+]);`
     };
 
     return (
@@ -159,10 +180,24 @@ client.emails.send(
                             >
                                 Python
                             </Button>
+                            <Button
+                                variant={activeTab === 'dotnet' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                onClick={() => setActiveTab('dotnet')}
+                            >
+                                .NET
+                            </Button>
+                            <Button
+                                variant={activeTab === 'php' ? 'secondary' : 'ghost'}
+                                size="sm"
+                                onClick={() => setActiveTab('php')}
+                            >
+                                PHP
+                            </Button>
                         </div>
                         <div className="p-0">
                             <SyntaxHighlighter
-                                language={activeTab === 'curl' ? 'bash' : activeTab === 'node' ? 'javascript' : 'python'}
+                                language={activeTab === 'curl' ? 'bash' : activeTab === 'node' ? 'javascript' : activeTab === 'python' ? 'python' : activeTab === 'dotnet' ? 'csharp' : 'php'}
                                 style={vscDarkPlus}
                                 customStyle={{
                                     margin: 0,
