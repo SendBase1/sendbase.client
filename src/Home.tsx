@@ -34,25 +34,25 @@ function Home() {
     "subject": "Welcome!",
     "html": "<h1>Hello World</h1>"
   }'`,
-        node: `import { EmailClient } from '@sendbase/email';
+        node: `import { SendBaseClient } from '@sendbase/email';
 
-const client = new EmailClient('YOUR_API_KEY');
+const client = new SendBaseClient('YOUR_API_KEY');
 
-await client.send({
-  from: 'hello@sendbase.app',
+await client.emails.send({
+  fromEmail: 'hello@sendbase.app',
   to: ['customer@example.com'],
   subject: 'Welcome!',
-  html: '<h1>Hello World</h1>'
+  htmlBody: '<h1>Hello World</h1>'
 });`,
-        python: `from email_client import EmailClient
+        python: `from sendbase_email import SendBaseClient
 
-client = EmailClient('YOUR_API_KEY')
+client = SendBaseClient('YOUR_API_KEY')
 
-client.send(
+client.emails.send(
     from_email='hello@sendbase.app',
     to=['customer@example.com'],
     subject='Welcome!',
-    html='<h1>Hello World</h1>'
+    html_body='<h1>Hello World</h1>'
 )`
     };
 
