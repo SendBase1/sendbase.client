@@ -126,8 +126,8 @@ $client->emails->send([
                             <Link to="/login">
                                 <Button size="lg">Start for free</Button>
                             </Link>
-                            <Button size="lg" variant="outline">
-                                View Documentation
+                            <Button size="lg" variant="outline" >
+                                <a href="https://docs.sendbase.app" target="_blank" rel="noopener noreferrer">View Docs</a>
                             </Button>
                         </div>
                         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground pt-4">

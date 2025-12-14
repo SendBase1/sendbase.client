@@ -52,7 +52,7 @@ export function AuthTransition({
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Mail className="h-4 w-4" />
-          <span className="text-sm font-medium">EmailAPI</span>
+          <span className="text-sm font-medium">Sendbase</span>
         </div>
       </div>
     </div>
