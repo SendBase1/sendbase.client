@@ -215,7 +215,7 @@ $client->emails->send([
             </section>
 
             {/* Features Section */}
-            <section className="w-full py-16 md:py-24 border-t">
+            <section id="features" className="w-full py-16 md:py-24 border-t">
                 <div className="container mx-auto max-w-7xl px-4 md:px-6">
                     <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
                     <h2 className="font-bold text-3xl leading-[1.1] sm:text-3xl md:text-5xl">
@@ -439,9 +439,11 @@ $client->emails->send([
                         <Link to="/login">
                             <Button size="lg">Get Started Free</Button>
                         </Link>
-                        <Button size="lg" variant="outline">
-                            View Docs
-                        </Button>
+                        <a href="https://docs.sendbase.app" target="_blank" rel="noopener noreferrer">
+                            <Button size="lg" variant="outline">
+                                View Docs
+                            </Button>
+                        </a>
                         </div>
                     </div>
                 </div>
@@ -450,44 +452,19 @@ $client->emails->send([
             {/* Footer */}
             <footer className="w-full border-t">
                 <div className="container mx-auto max-w-7xl px-4 md:px-6 py-14">
-                    <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+                    <div className="grid grid-cols-2 gap-8 md:grid-cols-3">
                         <div>
                             <h3 className="mb-4 text-sm font-semibold">Product</h3>
                             <ul className="space-y-3 text-sm">
                                 <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                                    <a href="#features" className="text-muted-foreground hover:text-foreground transition-colors">
                                         Features
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                                    <Link to="/pricing" className="text-muted-foreground hover:text-foreground transition-colors">
                                         Pricing
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                                        API
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h3 className="mb-4 text-sm font-semibold">Company</h3>
-                            <ul className="space-y-3 text-sm">
-                                <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                                        About
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                                        Blog
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                                        Careers
-                                    </a>
+                                    </Link>
                                 </li>
                             </ul>
                         </div>
@@ -495,7 +472,7 @@ $client->emails->send([
                             <h3 className="mb-4 text-sm font-semibold">Resources</h3>
                             <ul className="space-y-3 text-sm">
                                 <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
+                                    <a href="https://docs.sendbase.app" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
                                         Documentation
                                     </a>
                                 </li>
@@ -503,11 +480,6 @@ $client->emails->send([
                                     <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
                                         Contact Us
                                     </Link>
-                                </li>
-                                <li>
-                                    <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-                                        Status
-                                    </a>
                                 </li>
                             </ul>
                         </div>
