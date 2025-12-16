@@ -59,10 +59,10 @@ function Dashboard() {
     };
 
     return (
-        <div className="p-8 max-w-[1400px]">
+        <div className="p-4 md:p-8 max-w-[1400px]">
             {/* Header */}
             <div className="mb-8">
-                <h1 className="text-3xl font-semibold mb-1">Dashboard</h1>
+                <h1 className="text-2xl md:text-3xl font-semibold mb-1">Dashboard</h1>
                 <p className="text-sm text-muted-foreground">
                     Monitor and manage your email infrastructure
                 </p>
@@ -246,6 +246,7 @@ function Dashboard() {
                             <Clock className="h-5 w-5 animate-spin text-muted-foreground" />
                         </div>
                     ) : recentMessages.length > 0 ? (
+                        <div className="overflow-x-auto">
                         <Table>
                             <TableHeader>
                                 <TableRow className="hover:bg-transparent">
@@ -280,6 +281,7 @@ function Dashboard() {
                                 ))}
                             </TableBody>
                         </Table>
+                        </div>
                     ) : (
                         <div className="text-center py-12">
                             <Mail className="h-8 w-8 text-muted-foreground mx-auto mb-3" />

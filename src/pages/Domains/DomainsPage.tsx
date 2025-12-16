@@ -156,11 +156,11 @@ export function DomainsPage() {
   }
 
   return (
-    <div className="flex-1 space-y-6 p-8">
+    <div className="flex-1 space-y-6 p-4 md:p-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Domains</h2>
+          <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Domains</h2>
           <p className="text-muted-foreground mt-1">
             Manage your verified sending domains
           </p>
@@ -175,6 +175,7 @@ export function DomainsPage() {
       {domains && domains.length > 0 ? (
         <Card>
           <CardContent className="p-0">
+            <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -233,6 +234,7 @@ export function DomainsPage() {
                 ))}
               </TableBody>
             </Table>
+            </div>
           </CardContent>
         </Card>
       ) : (

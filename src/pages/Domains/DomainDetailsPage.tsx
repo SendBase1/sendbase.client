@@ -85,7 +85,7 @@ export function DomainDetailsPage() {
 
   if (!domain) {
     return (
-      <div className="flex-1 space-y-6 p-8">
+      <div className="flex-1 space-y-6 p-4 md:p-8">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={() => navigate('/domains')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -108,7 +108,7 @@ export function DomainDetailsPage() {
   const isVerified = domain.verification_status === 1 && domain.dkim_status === 1;
 
   return (
-    <div className="flex-1 space-y-6 p-8">
+    <div className="flex-1 space-y-6 p-4 md:p-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -117,7 +117,7 @@ export function DomainDetailsPage() {
             Back
           </Button>
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">{domain.domain}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">{domain.domain}</h2>
             <p className="text-muted-foreground mt-1">
               Domain verification and DNS configuration
             </p>
@@ -242,6 +242,7 @@ export function DomainDetailsPage() {
             </p>
           </div>
 
+          <div className="overflow-x-auto">
           <Table>
           <TableHeader>
             <TableRow>
@@ -332,6 +333,7 @@ export function DomainDetailsPage() {
             )}
           </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 

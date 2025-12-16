@@ -75,7 +75,7 @@ export function MessageDetailsPage() {
 
   if (!message) {
     return (
-      <div className="flex-1 space-y-6 p-8">
+      <div className="flex-1 space-y-6 p-4 md:p-8">
         <div className="flex items-center gap-4">
           <Button variant="ghost" onClick={() => navigate('/messages')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -96,7 +96,7 @@ export function MessageDetailsPage() {
   }
 
   return (
-    <div className="flex-1 space-y-6 p-8">
+    <div className="flex-1 space-y-6 p-4 md:p-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -105,7 +105,7 @@ export function MessageDetailsPage() {
             Back
           </Button>
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">
               {message.subject || 'No Subject'}
             </h2>
             <p className="text-muted-foreground mt-1">
@@ -221,6 +221,7 @@ export function MessageDetailsPage() {
           <CardTitle>Recipients ({message.recipients.length})</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
+          <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -255,6 +256,7 @@ export function MessageDetailsPage() {
               ))}
             </TableBody>
           </Table>
+          </div>
         </CardContent>
       </Card>
 

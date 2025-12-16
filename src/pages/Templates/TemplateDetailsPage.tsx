@@ -215,7 +215,7 @@ Console.WriteLine(result);`;
 
   if (!template) {
     return (
-      <div className="flex-1 p-8">
+      <div className="flex-1 p-4 md:p-8">
         <div className="text-center py-16">
           <h3 className="text-lg font-semibold mb-2">Template not found</h3>
           <Button onClick={() => navigate('/templates')}>
@@ -228,7 +228,7 @@ Console.WriteLine(result);`;
   }
 
   return (
-    <div className="flex-1 space-y-6 p-8">
+    <div className="flex-1 space-y-6 p-4 md:p-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -236,7 +236,7 @@ Console.WriteLine(result);`;
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">{template.name}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">{template.name}</h2>
             <p className="text-muted-foreground mt-1">
               Version {template.version} &middot; Created {new Date(template.created_at_utc).toLocaleDateString()}
             </p>
