@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Check, ChevronsUpDown, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -26,32 +26,31 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { tenantsApi, entraAuthApi, setCurrentTenantId } from '@/lib/api';
+import { tenantsApi, entraAuthApi, setCurrentTenantId, type TenantInfo } from '@/lib/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-import type { TenantResponse } from '@/lib/types';
 
 export function WorkspaceSwitcher() {
   const [open, setOpen] = useState(false);
   const [showNewTeamDialog, setShowNewTeamDialog] = useState(false);
   const [newTeamName, setNewTeamName] = useState('');
   const queryClient = useQueryClient();
-  const { currentTenant, setCurrentTenant } = useAuth();
+  const { currentTenant, setCurrentTenant, availableTenants, addTenant, isInitialized } = useAuth();
 
-  const { data: tenants = [], isLoading } = useQuery({
-    queryKey: ['tenants'],
-    queryFn: tenantsApi.getAll,
-  });
+  // Use availableTenants from AuthContext instead of making a separate API call
+  const tenants = availableTenants;
+  const isLoading = !isInitialized;
 
   const createTeamMutation = useMutation({
     mutationFn: (name: string) => tenantsApi.create(name),
     onSuccess: async (newTenant) => {
-      queryClient.invalidateQueries({ queryKey: ['tenants'] });
+      // Add the new tenant to the context
+      addTenant({ id: newTenant.id, name: newTenant.name });
       setShowNewTeamDialog(false);
       setNewTeamName('');
       // Switch to the new team
-      await handleSelectTenant(newTenant);
+      await handleSelectTenant({ id: newTenant.id, name: newTenant.name });
       toast.success(`Team "${newTenant.name}" created`);
     },
     onError: (error: Error) => {
@@ -59,7 +58,7 @@ export function WorkspaceSwitcher() {
     },
   });
 
-  const handleSelectTenant = async (tenant: TenantResponse) => {
+  const handleSelectTenant = async (tenant: TenantInfo) => {
     try {
       const response = await entraAuthApi.switchTenant(tenant.id);
       // Update the API module's tenant ID so all subsequent requests use it
@@ -78,8 +77,6 @@ export function WorkspaceSwitcher() {
     }
   };
 
-  const currentTenantData = tenants.find(t => t.id === currentTenant?.id);
-
   return (
     <>
       <Popover open={open} onOpenChange={setOpen}>
@@ -92,7 +89,7 @@ export function WorkspaceSwitcher() {
             className="w-full justify-between"
           >
             <span className="truncate">
-              {isLoading ? 'Loading...' : currentTenantData?.name || currentTenant?.name || 'Select team'}
+              {isLoading ? 'Loading...' : currentTenant?.name || 'Select team'}
             </span>
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>

@@ -44,6 +44,7 @@ interface AuthContextType {
   logout: () => void;
   switchTenant: (tenantId: string) => Promise<void>;
   setCurrentTenant: (tenant: TenantInfo | null) => void;
+  addTenant: (tenant: TenantInfo) => void;
   isLoading: boolean;
   isInitialized: boolean;
   getAccessToken: () => Promise<string | null>;
@@ -209,6 +210,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Add a new tenant to availableTenants (used when creating a new team)
+  const addTenant = useCallback((tenant: TenantInfo) => {
+    setAvailableTenants(prev => {
+      // Avoid duplicates
+      if (prev.some(t => t.id === tenant.id)) {
+        return prev;
+      }
+      return [...prev, tenant];
+    });
+  }, []);
+
   // Get access token for API calls
   const getAccessToken = useCallback(async (): Promise<string | null> => {
     if (!account) return null;
@@ -256,6 +268,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       logout,
       switchTenant,
       setCurrentTenant,
+      addTenant,
       isLoading,
       isInitialized,
       getAccessToken,
