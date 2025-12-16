@@ -88,7 +88,7 @@ export function ContactPage() {
           onClick={() => navigate(-1)}
           className="mb-12 -ml-4 text-muted-foreground hover:text-foreground"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="h-4 w-4 mr-2 " />
           Back
         </Button>
 
