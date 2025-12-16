@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { HelmetProvider } from 'react-helmet-async'
 import { Toaster } from './components/ui/sonner'
 import './index.css'
 import App from './App.tsx'
@@ -85,10 +86,12 @@ showInitialLoader()
 initializeMsal().then(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <App />
-        <Toaster position="bottom-right" richColors />
-      </QueryClientProvider>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <App />
+          <Toaster position="bottom-right" richColors />
+        </QueryClientProvider>
+      </HelmetProvider>
     </StrictMode>,
   )
 }).catch((error) => {
@@ -96,10 +99,12 @@ initializeMsal().then(() => {
   // Render app anyway, but auth won't work
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <App />
-        <Toaster position="bottom-right" richColors />
-      </QueryClientProvider>
+      <HelmetProvider>
+        <QueryClientProvider client={queryClient}>
+          <App />
+          <Toaster position="bottom-right" richColors />
+        </QueryClientProvider>
+      </HelmetProvider>
     </StrictMode>,
   )
 })

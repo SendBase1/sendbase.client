@@ -1,0 +1,19 @@
+# Sendbase robots.txt
+User-agent: *
+Allow: /
+
+# Sitemaps
+Sitemap: https://sendbase.app/sitemap.xml
+
+# Disallow protected routes
+Disallow: /dashboard
+Disallow: /domains
+Disallow: /messages
+Disallow: /send
+Disallow: /inbound
+Disallow: /apikeys
+Disallow: /webhooks
+Disallow: /templates
+Disallow: /settings
+Disallow: /billing
+Disallow: /profile

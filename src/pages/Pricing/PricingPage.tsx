@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/table';
 import { Mail, Check, X, ArrowRight } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
+import { SEO } from '@/components/SEO';
 
 export function PricingPage() {
     const { theme, setTheme } = useTheme();
@@ -99,6 +100,12 @@ export function PricingPage() {
 
     return (
         <div className="min-h-screen">
+            <SEO
+                title="Pricing"
+                description="Simple, transparent pricing for Sendbase email API. Start free with 25,000 emails/month. No hidden fees, scale as you grow."
+                canonical="/pricing"
+                keywords="email API pricing, transactional email cost, email service pricing, Sendbase pricing"
+            />
             {/* Navigation */}
             <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="container mx-auto flex h-14 max-w-7xl items-center px-4 md:px-6">

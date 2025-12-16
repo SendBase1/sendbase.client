@@ -6,6 +6,7 @@ import { ArrowLeft, Copy, Check, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { contactApi } from '@/lib/api';
+import { SEO } from '@/components/SEO';
 
 export function ContactPage() {
   const navigate = useNavigate();
@@ -48,9 +49,18 @@ export function ContactPage() {
     { label: 'Report security concerns', email: 'security@sendbase.app' },
   ];
 
+  const seoComponent = (
+    <SEO
+      title="Contact Us"
+      description="Get in touch with Sendbase. We're here to help with questions about our email API, pricing, or technical support."
+      canonical="/contact"
+    />
+  );
+
   if (isSuccess) {
     return (
       <div className="min-h-screen bg-background">
+        {seoComponent}
         <div className="max-w-5xl mx-auto px-6 py-24 md:py-32">
           <Button
             variant="ghost"
@@ -82,6 +92,7 @@ export function ContactPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {seoComponent}
       <div className="max-w-5xl mx-auto px-6 py-24 md:py-32">
         <Button
           variant="ghost"

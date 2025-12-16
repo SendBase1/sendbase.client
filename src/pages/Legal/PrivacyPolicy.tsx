@@ -2,12 +2,18 @@ import { Card, CardContent } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { SEO } from '@/components/SEO';
 
 export function PrivacyPolicy() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Privacy Policy"
+        description="Learn how Sendbase collects, uses, and protects your data. Our privacy policy explains our commitment to your privacy and data security."
+        canonical="/privacy"
+      />
       <div className="max-w-4xl mx-auto px-4 py-12">
         <Button
           variant="ghost"

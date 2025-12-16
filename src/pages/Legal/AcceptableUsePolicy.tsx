@@ -3,12 +3,18 @@ import { Button } from '../../components/ui/button';
 import { ArrowLeft, AlertTriangle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription } from '../../components/ui/alert';
+import { SEO } from '@/components/SEO';
 
 export function AcceptableUsePolicy() {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Acceptable Use Policy"
+        description="Sendbase Acceptable Use Policy outlines the rules for using our email delivery service. Learn what's allowed and prohibited."
+        canonical="/acceptable-use"
+      />
       <div className="max-w-4xl mx-auto px-4 py-12">
         <Button
           variant="ghost"

@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Mail, ArrowLeft } from 'lucide-react';
 import { useAuth } from './contexts/AuthContext';
 import { RedirectingToLogin, ProcessingLogin } from './components/AuthTransition';
+import { SEO } from '@/components/SEO';
 
 function SignIn() {
     const navigate = useNavigate();
@@ -58,6 +59,11 @@ function SignIn() {
 
     return (
         <div className="min-h-screen flex flex-col">
+            <SEO
+                title="Sign In"
+                description="Sign in to Sendbase to manage your email API, domains, and delivery analytics. Create a free account to get started."
+                canonical="/login"
+            />
             {/* Header */}
             <header className="border-b">
                 <div className="container mx-auto flex h-14 max-w-7xl items-center px-4 md:px-6">

@@ -1,0 +1,19 @@
+{
+  "name": "Sendbase - Email API for Developers",
+  "short_name": "Sendbase",
+  "description": "Send transactional and marketing emails at scale with Sendbase.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["developer tools", "productivity", "business"]
+}
