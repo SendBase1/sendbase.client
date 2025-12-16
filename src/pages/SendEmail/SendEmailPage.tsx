@@ -158,10 +158,10 @@ export function SendEmailPage() {
   };
 
   return (
-    <div className="flex-1 space-y-6 p-8">
+    <div className="flex-1 space-y-6 p-4 md:p-8">
       {/* Header */}
       <div>
-        <h2 className="text-3xl font-bold tracking-tight">Send Email</h2>
+        <h2 className="text-2xl md:text-3xl font-bold tracking-tight">Send Email</h2>
         <p className="text-muted-foreground mt-1">
           Compose and send emails using your verified domains
         </p>

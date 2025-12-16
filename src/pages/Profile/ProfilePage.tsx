@@ -50,10 +50,10 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="p-8 max-w-4xl">
+    <div className="p-4 md:p-8 max-w-4xl">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold mb-1">Profile</h1>
+        <h1 className="text-2xl md:text-3xl font-semibold mb-1">Profile</h1>
         <p className="text-sm text-muted-foreground">
           Manage your account settings and preferences
         </p>

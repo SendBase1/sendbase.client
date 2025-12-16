@@ -149,7 +149,7 @@ export function WebhookDetailsPage() {
 
   if (!webhook) {
     return (
-      <div className="p-8">
+      <div className="p-4 md:p-8">
         <div className="text-center">
           <h2 className="text-2xl font-bold">Webhook not found</h2>
           <p className="text-muted-foreground mt-2">
@@ -165,7 +165,7 @@ export function WebhookDetailsPage() {
   }
 
   return (
-    <div className="flex-1 space-y-6 p-8">
+    <div className="flex-1 space-y-6 p-4 md:p-8">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -173,7 +173,7 @@ export function WebhookDetailsPage() {
             <ArrowLeft className="h-4 w-4" />
           </Button>
           <div>
-            <h2 className="text-3xl font-bold tracking-tight">{webhook.name}</h2>
+            <h2 className="text-2xl md:text-3xl font-bold tracking-tight">{webhook.name}</h2>
             <p className="text-muted-foreground mt-1">{webhook.url}</p>
           </div>
         </div>
@@ -263,6 +263,7 @@ export function WebhookDetailsPage() {
                 <RefreshCw className="h-6 w-6 animate-spin text-muted-foreground" />
               </div>
             ) : deliveries && deliveries.length > 0 ? (
+              <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
                   <TableRow>
@@ -306,6 +307,7 @@ export function WebhookDetailsPage() {
                   ))}
                 </TableBody>
               </Table>
+              </div>
             ) : (
               <div className="text-center py-8 text-muted-foreground">
                 <p>No deliveries yet</p>

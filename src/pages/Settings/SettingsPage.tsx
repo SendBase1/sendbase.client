@@ -145,9 +145,9 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
+    <div className="container mx-auto p-4 md:p-6 max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Settings</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">Settings</h1>
         <p className="text-muted-foreground">Manage your team settings and members</p>
       </div>
 
@@ -181,6 +181,7 @@ export function SettingsPage() {
                   <Loader2 className="h-6 w-6 animate-spin" />
                 </div>
               ) : (
+                <div className="overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -240,6 +241,7 @@ export function SettingsPage() {
                     ))}
                   </TableBody>
                 </Table>
+                </div>
               )}
             </CardContent>
           </Card>
@@ -258,6 +260,7 @@ export function SettingsPage() {
                     <Loader2 className="h-6 w-6 animate-spin" />
                   </div>
                 ) : (
+                  <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
                       <TableRow>
@@ -313,6 +316,7 @@ export function SettingsPage() {
                       ))}
                     </TableBody>
                   </Table>
+                  </div>
                 )}
               </CardContent>
             </Card>
