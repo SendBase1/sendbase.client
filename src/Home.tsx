@@ -483,6 +483,11 @@ $client->emails->send([
                                     </a>
                                 </li>
                                 <li>
+                                    <a href="https://status.sendbase.app" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
+                                        Status
+                                    </a>
+                                </li>
+                                <li>
                                     <Link to="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
                                         Contact Us
                                     </Link>
