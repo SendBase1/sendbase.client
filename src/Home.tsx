@@ -125,7 +125,7 @@ $client->emails->send([
                                 Sendbase for developers
                             </h1>
                             <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8 mx-auto">
-                                The best way to reach humans instead of spam folders. Deliver transactional and marketing emails at scale.
+                                The best way to reach humans instead of spam folders. Deliver transactional emails at scale.
                             </p>
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
