@@ -28,6 +28,8 @@ import {
   FileText,
   Inbox,
   Menu,
+  Bell,
+  Smartphone,
 } from 'lucide-react';
 
 export function AppLayout() {
@@ -47,6 +49,8 @@ export function AppLayout() {
     { path: '/inbound', label: 'Inbound', icon: Inbox },
     { path: '/apikeys', label: 'API Keys', icon: Key },
     { path: '/webhooks', label: 'Webhooks', icon: Webhook },
+    { path: '/push', label: 'Push', icon: Bell },
+    { path: '/sms', label: 'SMS', icon: Smartphone },
     { path: '/settings', label: 'Settings', icon: Settings },
     { path: '/billing', label: 'Billing', icon: CreditCard },
     { path: '/contact', label: 'Contact Us', icon: HelpCircle },

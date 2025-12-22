@@ -45,6 +45,30 @@ import type {
   InboundMessageResponse,
   InboundMessageListResponse,
   InboundEmailDownloadResponse,
+  PushCredentialResponse,
+  PushCredentialListResponse,
+  CreatePushCredentialRequest,
+  UpdatePushCredentialRequest,
+  PushDeviceResponse,
+  PushDeviceListResponse,
+  RegisterPushDeviceRequest,
+  UpdatePushDeviceRequest,
+  PushMessageResponse,
+  PushMessageListResponse,
+  SendPushRequest,
+  SendPushResponse,
+  PushTemplateResponse,
+  PushTemplateListResponse,
+  CreatePushTemplateRequest,
+  UpdatePushTemplateRequest,
+  SmsMessageResponse,
+  SmsMessageListResponse,
+  SendSmsRequest,
+  SendSmsResponse,
+  SmsTemplateResponse,
+  SmsTemplateListResponse,
+  CreateSmsTemplateRequest,
+  UpdateSmsTemplateRequest,
 } from './types';
 import { API_BASE_URL } from './config';
 import { triggerLogout } from '../contexts/AuthContext';
@@ -774,5 +798,272 @@ export const templateApi = {
     });
     if (!response.ok) throw new Error('Failed to preview template');
     return response.json();
+  },
+};
+
+// Push Notification API
+export const pushApi = {
+  // Credentials
+  async getCredentials(): Promise<PushCredentialListResponse> {
+    const response = await fetchWithAuth('/api/v1/push/credentials');
+    if (!response.ok) throw new Error('Failed to fetch push credentials');
+    return response.json();
+  },
+
+  async getCredential(id: string): Promise<PushCredentialResponse> {
+    const response = await fetchWithAuth(`/api/v1/push/credentials/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch push credential');
+    return response.json();
+  },
+
+  async createCredential(data: CreatePushCredentialRequest): Promise<PushCredentialResponse> {
+    const response = await fetchWithAuth('/api/v1/push/credentials', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create push credential');
+    }
+    return response.json();
+  },
+
+  async updateCredential(id: string, data: UpdatePushCredentialRequest): Promise<PushCredentialResponse> {
+    const response = await fetchWithAuth(`/api/v1/push/credentials/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update push credential');
+    }
+    return response.json();
+  },
+
+  async deleteCredential(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/push/credentials/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete push credential');
+  },
+
+  async setDefaultCredential(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/push/credentials/${id}/set-default`, {
+      method: 'POST',
+    });
+    if (!response.ok) throw new Error('Failed to set default credential');
+  },
+
+  async validateCredential(id: string): Promise<{ is_valid: boolean; message?: string }> {
+    const response = await fetchWithAuth(`/api/v1/push/credentials/${id}/validate`, {
+      method: 'POST',
+    });
+    if (!response.ok) throw new Error('Failed to validate credential');
+    return response.json();
+  },
+
+  // Devices
+  async getDevices(page = 1, pageSize = 50): Promise<PushDeviceListResponse> {
+    const response = await fetchWithAuth(`/api/v1/push/devices?page=${page}&page_size=${pageSize}`);
+    if (!response.ok) throw new Error('Failed to fetch push devices');
+    return response.json();
+  },
+
+  async getDevice(id: string): Promise<PushDeviceResponse> {
+    const response = await fetchWithAuth(`/api/v1/push/devices/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch push device');
+    return response.json();
+  },
+
+  async registerDevice(data: RegisterPushDeviceRequest): Promise<PushDeviceResponse> {
+    const response = await fetchWithAuth('/api/v1/push/devices', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to register push device');
+    }
+    return response.json();
+  },
+
+  async updateDevice(id: string, data: UpdatePushDeviceRequest): Promise<PushDeviceResponse> {
+    const response = await fetchWithAuth(`/api/v1/push/devices/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update push device');
+    }
+    return response.json();
+  },
+
+  async deleteDevice(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/push/devices/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete push device');
+  },
+
+  // Messages
+  async getMessages(page = 1, pageSize = 50): Promise<PushMessageListResponse> {
+    const response = await fetchWithAuth(`/api/v1/push?page=${page}&page_size=${pageSize}`);
+    if (!response.ok) throw new Error('Failed to fetch push messages');
+    return response.json();
+  },
+
+  async getMessage(id: string): Promise<PushMessageResponse> {
+    const response = await fetchWithAuth(`/api/v1/push/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch push message');
+    return response.json();
+  },
+
+  async sendMessage(data: SendPushRequest): Promise<SendPushResponse> {
+    const response = await fetchWithAuth('/api/v1/push/send', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to send push notification');
+    }
+    return response.json();
+  },
+
+  async cancelMessage(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/push/${id}/cancel`, {
+      method: 'POST',
+    });
+    if (!response.ok) throw new Error('Failed to cancel push message');
+  },
+
+  // Templates
+  async getTemplates(page = 1, pageSize = 50): Promise<PushTemplateListResponse> {
+    const response = await fetchWithAuth(`/api/v1/push/templates?page=${page}&page_size=${pageSize}`);
+    if (!response.ok) throw new Error('Failed to fetch push templates');
+    return response.json();
+  },
+
+  async getTemplate(id: string): Promise<PushTemplateResponse> {
+    const response = await fetchWithAuth(`/api/v1/push/templates/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch push template');
+    return response.json();
+  },
+
+  async createTemplate(data: CreatePushTemplateRequest): Promise<PushTemplateResponse> {
+    const response = await fetchWithAuth('/api/v1/push/templates', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create push template');
+    }
+    return response.json();
+  },
+
+  async updateTemplate(id: string, data: UpdatePushTemplateRequest): Promise<PushTemplateResponse> {
+    const response = await fetchWithAuth(`/api/v1/push/templates/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update push template');
+    }
+    return response.json();
+  },
+
+  async deleteTemplate(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/push/templates/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete push template');
+  },
+};
+
+// SMS API
+export const smsApi = {
+  // Messages
+  async getMessages(page = 1, pageSize = 50, status?: number): Promise<SmsMessageListResponse> {
+    const params = new URLSearchParams({
+      page: page.toString(),
+      page_size: pageSize.toString(),
+    });
+    if (status !== undefined) params.append('status', status.toString());
+
+    const response = await fetchWithAuth(`/api/v1/sms?${params}`);
+    if (!response.ok) throw new Error('Failed to fetch SMS messages');
+    return response.json();
+  },
+
+  async getMessage(id: string): Promise<SmsMessageResponse> {
+    const response = await fetchWithAuth(`/api/v1/sms/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch SMS message');
+    return response.json();
+  },
+
+  async sendMessage(data: SendSmsRequest): Promise<SendSmsResponse> {
+    const response = await fetchWithAuth('/api/v1/sms/send', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to send SMS');
+    }
+    return response.json();
+  },
+
+  async cancelMessage(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/sms/${id}/cancel`, {
+      method: 'POST',
+    });
+    if (!response.ok) throw new Error('Failed to cancel SMS');
+  },
+
+  // Templates
+  async getTemplates(page = 1, pageSize = 50): Promise<SmsTemplateListResponse> {
+    const response = await fetchWithAuth(`/api/v1/sms/templates?page=${page}&pageSize=${pageSize}`);
+    if (!response.ok) throw new Error('Failed to fetch SMS templates');
+    return response.json();
+  },
+
+  async getTemplate(id: string): Promise<SmsTemplateResponse> {
+    const response = await fetchWithAuth(`/api/v1/sms/templates/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch SMS template');
+    return response.json();
+  },
+
+  async createTemplate(data: CreateSmsTemplateRequest): Promise<SmsTemplateResponse> {
+    const response = await fetchWithAuth('/api/v1/sms/templates', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create SMS template');
+    }
+    return response.json();
+  },
+
+  async updateTemplate(id: string, data: UpdateSmsTemplateRequest): Promise<SmsTemplateResponse> {
+    const response = await fetchWithAuth(`/api/v1/sms/templates/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update SMS template');
+    }
+    return response.json();
+  },
+
+  async deleteTemplate(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/sms/templates/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete SMS template');
   },
 };

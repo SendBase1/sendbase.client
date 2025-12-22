@@ -480,3 +480,247 @@ export interface AttachmentDownloadResponse {
   download_url: string;
   expires_at_utc: string;
 }
+
+// Push Notification Types
+
+export type PushPlatform = 'Apns' | 'Fcm';
+export type PushCredentialStatus = 'Pending' | 'Active' | 'Invalid' | 'Expired';
+
+export interface PushCredentialResponse {
+  id: string;
+  platform: number;
+  platform_name: string;
+  name: string;
+  application_id: string;
+  key_id?: string;
+  team_id?: string;
+  status: number;
+  status_text: string;
+  status_message?: string;
+  is_default: boolean;
+  is_active: boolean;
+  validated_at_utc?: string;
+  expires_at_utc?: string;
+  created_at_utc: string;
+  updated_at_utc?: string;
+}
+
+export interface PushCredentialListResponse {
+  credentials: PushCredentialResponse[];
+  total: number;
+}
+
+export interface CreatePushCredentialRequest {
+  platform: number;
+  name: string;
+  application_id: string;
+  credentials: string;
+  key_id?: string;
+  team_id?: string;
+}
+
+export interface UpdatePushCredentialRequest {
+  name?: string;
+  credentials?: string;
+  key_id?: string;
+  team_id?: string;
+  is_active?: boolean;
+}
+
+export interface PushDeviceResponse {
+  id: string;
+  credential_id: string;
+  token: string;
+  platform: number;
+  platform_name: string;
+  external_user_id?: string;
+  metadata?: Record<string, string>;
+  is_active: boolean;
+  created_at_utc: string;
+  last_seen_at_utc?: string;
+}
+
+export interface PushDeviceListResponse {
+  devices: PushDeviceResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface RegisterPushDeviceRequest {
+  credential_id: string;
+  token: string;
+  platform: number;
+  external_user_id?: string;
+  metadata?: Record<string, string>;
+}
+
+export interface UpdatePushDeviceRequest {
+  token?: string;
+  external_user_id?: string;
+  metadata?: Record<string, string>;
+  is_active?: boolean;
+}
+
+export interface PushMessageResponse {
+  id: string;
+  credential_id: string;
+  device_token_id?: string;
+  external_user_id?: string;
+  title: string;
+  body: string;
+  data?: Record<string, string>;
+  status: number;
+  status_text: string;
+  target_count: number;
+  delivered_count: number;
+  requested_at_utc: string;
+  scheduled_at_utc?: string;
+  sent_at_utc?: string;
+  error?: string;
+}
+
+export interface PushMessageListResponse {
+  messages: PushMessageResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface PlatformPushOptions {
+  apns_priority?: string;
+  apns_collapse_id?: string;
+  apns_badge?: number;
+  apns_sound?: string;
+  fcm_priority?: string;
+  fcm_collapse_key?: string;
+  fcm_ttl_seconds?: number;
+}
+
+export interface SendPushRequest {
+  credential_id?: string;
+  device_token_id?: string;
+  external_user_id?: string;
+  title: string;
+  body: string;
+  template_id?: string;
+  template_variables?: Record<string, string>;
+  data?: Record<string, string>;
+  scheduled_at_utc?: string;
+  platform_options?: PlatformPushOptions;
+}
+
+export interface SendPushResponse {
+  message_id: string;
+  aws_message_id?: string;
+  status: number;
+  status_text: string;
+  target_count: number;
+  requested_at_utc: string;
+  scheduled_at_utc?: string;
+  error?: string;
+}
+
+export interface PushTemplateResponse {
+  id: string;
+  name: string;
+  title: string;
+  body: string;
+  default_data?: Record<string, string>;
+  is_active: boolean;
+  created_at_utc: string;
+  updated_at_utc?: string;
+}
+
+export interface PushTemplateListResponse {
+  templates: PushTemplateResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface CreatePushTemplateRequest {
+  name: string;
+  title: string;
+  body: string;
+  default_data?: Record<string, string>;
+}
+
+export interface UpdatePushTemplateRequest {
+  name?: string;
+  title?: string;
+  body?: string;
+  default_data?: Record<string, string>;
+  is_active?: boolean;
+}
+
+// SMS Types
+
+export interface SmsMessageResponse {
+  id: string;
+  from_number: string;
+  to_number: string;
+  body: string;
+  template_id?: string;
+  aws_message_id?: string;
+  status: number;
+  status_text: string;
+  segment_count: number;
+  requested_at_utc: string;
+  scheduled_at_utc?: string;
+  sent_at_utc?: string;
+  error?: string;
+}
+
+export interface SmsMessageListResponse {
+  messages: SmsMessageResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface SendSmsRequest {
+  to: string;
+  body: string;
+  template_id?: string;
+  template_variables?: Record<string, string>;
+  scheduled_at_utc?: string;
+}
+
+export interface SendSmsResponse {
+  message_id: string;
+  aws_message_id?: string;
+  status: number;
+  status_text: string;
+  segment_count: number;
+  requested_at_utc: string;
+  scheduled_at_utc?: string;
+  error?: string;
+}
+
+export interface SmsTemplateResponse {
+  id: string;
+  name: string;
+  body: string;
+  is_active: boolean;
+  created_at_utc: string;
+  updated_at_utc?: string;
+}
+
+export interface SmsTemplateListResponse {
+  templates: SmsTemplateResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface CreateSmsTemplateRequest {
+  name: string;
+  body: string;
+}
+
+export interface UpdateSmsTemplateRequest {
+  name?: string;
+  body?: string;
+  is_active?: boolean;
+}
