@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Mail, Send, Shield, Zap, BarChart3, Clock, Check } from 'lucide-react';
+import { MessageSquare, Shield, Zap, BarChart3, Clock, Check, Globe, FileText } from 'lucide-react';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { useTheme } from '@/components/theme-provider';
@@ -26,63 +26,53 @@ function Home() {
     const exampleApiUrl = 'https://api.sendbase.app';
 
     const codeExamples = {
-        curl: `curl -X POST '${exampleApiUrl}/v1/emails/send' \\
+        curl: `curl -X POST '${exampleApiUrl}/v1/sms/send' \\
   -H 'Authorization: Bearer YOUR_API_KEY' \\
   -H 'Content-Type: application/json' \\
   -d '{
-    "from": "hello@sendbase.app",
-    "to": ["customer@example.com"],
-    "subject": "Welcome!",
-    "html": "<h1>Hello World</h1>"
+    "to": "+15551234567",
+    "body": "Your verification code is 123456"
   }'`,
-        node: `import { SendBaseClient } from '@sendbase/email';
+        node: `import { SendBaseClient } from '@sendbase/sms';
 
 const client = new SendBaseClient('YOUR_API_KEY');
 
-await client.emails.send({
-  fromEmail: 'hello@sendbase.app',
-  to: ['customer@example.com'],
-  subject: 'Welcome!',
-  htmlBody: '<h1>Hello World</h1>'
+await client.sms.send({
+  to: '+15551234567',
+  body: 'Your verification code is 123456'
 });`,
-        python: `from sendbase_email import SendBaseClient
+        python: `from sendbase import SendBaseClient
 
 client = SendBaseClient('YOUR_API_KEY')
 
-client.emails.send(
-    from_email='hello@sendbase.app',
-    to=['customer@example.com'],
-    subject='Welcome!',
-    html_body='<h1>Hello World</h1>'
+client.sms.send(
+    to='+15551234567',
+    body='Your verification code is 123456'
 )`,
-        dotnet: `using SendBase.Email;
+        dotnet: `using SendBase;
 
 var client = new SendBaseClient("YOUR_API_KEY");
 
-await client.Emails.SendAsync(new SendEmailRequest
+await client.Sms.SendAsync(new SendSmsRequest
 {
-    FromEmail = "hello@sendbase.app",
-    To = new List<string> { "customer@example.com" },
-    Subject = "Welcome!",
-    HtmlBody = "<h1>Hello World</h1>"
+    To = "+15551234567",
+    Body = "Your verification code is 123456"
 });`,
         php: `require_once('vendor/autoload.php');
 
-$client = new SendBase\\Email\\SendBaseClient('YOUR_API_KEY');
+$client = new SendBase\\SendBaseClient('YOUR_API_KEY');
 
-$client->emails->send([
-    'from_email' => 'hello@sendbase.app',
-    'to' => ['customer@example.com'],
-    'subject' => 'Welcome!',
-    'html_body' => '<h1>Hello World</h1>'
+$client->sms->send([
+    'to' => '+15551234567',
+    'body' => 'Your verification code is 123456'
 ]);`
     };
 
     return (
         <div className="min-h-screen">
             <SEO
-                title="Email API for Developers"
-                description="Send transactional and marketing emails at scale with Sendbase. Simple REST API, high deliverability, real-time analytics, and developer-friendly SDKs."
+                title="SMS API for Developers"
+                description="Send transactional SMS messages at scale with Sendbase. Simple REST API, global coverage, real-time delivery tracking, and developer-friendly SDKs."
                 canonical="/"
             />
             {/* Navigation */}
@@ -90,7 +80,7 @@ $client->emails->send([
                 <div className="container mx-auto flex h-14 max-w-7xl items-center px-4 md:px-6">
                     <div className="mr-4 flex">
                         <Link to="/" className="mr-6 flex items-center space-x-2">
-                            <Mail className="h-6 w-6" />
+                            <MessageSquare className="h-6 w-6" />
                             <span className="font-bold">Sendbase</span>
                         </Link>
                     </div>
@@ -122,10 +112,10 @@ $client->emails->send([
                     <div className="flex flex-col items-center text-center space-y-8">
                         <div className="space-y-4 max-w-[64rem]">
                             <h1 className="font-bold text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
-                                Sendbase for developers
+                                SMS API for developers
                             </h1>
                             <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8 mx-auto">
-                                The best way to reach humans instead of spam folders. Deliver transactional emails at scale.
+                                The simplest way to send SMS messages globally. Deliver verification codes, alerts, and notifications at scale.
                             </p>
                         </div>
                         <div className="flex flex-col gap-4 sm:flex-row">
@@ -139,11 +129,15 @@ $client->emails->send([
                         <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground pt-4">
                             <div className="flex items-center gap-2">
                                 <Check className="h-4 w-4" />
-                                <span>Simple pricing</span>
+                                <span>Pay per message</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <Check className="h-4 w-4" />
                                 <span>99.9% uptime</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <Check className="h-4 w-4" />
+                                <span>Global coverage</span>
                             </div>
                         </div>
                     </div>
@@ -159,7 +153,7 @@ $client->emails->send([
                                 Simple, powerful API
                             </h2>
                             <p className="leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-                                Send your first email in minutes with our intuitive REST API
+                                Send your first SMS in minutes with our intuitive REST API
                             </p>
                         </div>
 
@@ -228,7 +222,7 @@ $client->emails->send([
                         Everything you need
                     </h2>
                     <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-                        From startups to enterprise, we provide the tools you need to send email at scale
+                        From startups to enterprise, we provide the tools you need to send SMS at scale
                     </p>
                     </div>
 
@@ -239,7 +233,31 @@ $client->emails->send([
                             <div className="space-y-2">
                                 <h3 className="font-bold text-xl">Lightning Fast</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Send emails in milliseconds with our optimized delivery infrastructure
+                                    Send SMS messages in milliseconds with our optimized delivery infrastructure
+                                </p>
+                            </div>
+                        </div>
+                    </Card>
+
+                    <Card className="relative overflow-hidden p-6">
+                        <div className="flex flex-col justify-between rounded-md h-full space-y-3">
+                            <Globe className="h-12 w-12" />
+                            <div className="space-y-2">
+                                <h3 className="font-bold text-xl">Global Coverage</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Reach customers in 200+ countries with reliable international delivery
+                                </p>
+                            </div>
+                        </div>
+                    </Card>
+
+                    <Card className="relative overflow-hidden p-6">
+                        <div className="flex flex-col justify-between rounded-md h-full space-y-3">
+                            <BarChart3 className="h-12 w-12" />
+                            <div className="space-y-2">
+                                <h3 className="font-bold text-xl">Real-time Tracking</h3>
+                                <p className="text-sm text-muted-foreground">
+                                    Track delivery status, failures, and engagement with detailed analytics
                                 </p>
                             </div>
                         </div>
@@ -251,31 +269,7 @@ $client->emails->send([
                             <div className="space-y-2">
                                 <h3 className="font-bold text-xl">Enterprise Security</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    SOC 2 compliant with DKIM, SPF, and DMARC authentication
-                                </p>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Card className="relative overflow-hidden p-6">
-                        <div className="flex flex-col justify-between rounded-md h-full space-y-3">
-                            <BarChart3 className="h-12 w-12" />
-                            <div className="space-y-2">
-                                <h3 className="font-bold text-xl">Real-time Analytics</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Track opens, clicks, bounces, and more with detailed analytics
-                                </p>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Card className="relative overflow-hidden p-6">
-                        <div className="flex flex-col justify-between rounded-md h-full space-y-3">
-                            <Send className="h-12 w-12" />
-                            <div className="space-y-2">
-                                <h3 className="font-bold text-xl">High Deliverability</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    Best-in-class delivery rates with automatic retry logic
+                                    SOC 2 compliant with encrypted delivery and secure API authentication
                                 </p>
                             </div>
                         </div>
@@ -285,7 +279,7 @@ $client->emails->send([
                         <div className="flex flex-col justify-between rounded-md h-full space-y-3">
                             <Clock className="h-12 w-12" />
                             <div className="space-y-2">
-                                <h3 className="font-bold text-xl">Email History</h3>
+                                <h3 className="font-bold text-xl">Message History</h3>
                                 <p className="text-sm text-muted-foreground">
                                     Full audit trail with complete message history and delivery events
                                 </p>
@@ -295,11 +289,11 @@ $client->emails->send([
 
                     <Card className="relative overflow-hidden p-6">
                         <div className="flex flex-col justify-between rounded-md h-full space-y-3">
-                            <Mail className="h-12 w-12" />
+                            <FileText className="h-12 w-12" />
                             <div className="space-y-2">
-                                <h3 className="font-bold text-xl">Domain Management</h3>
+                                <h3 className="font-bold text-xl">SMS Templates</h3>
                                 <p className="text-sm text-muted-foreground">
-                                    Easy DNS setup and verification for all your sending domains
+                                    Create reusable templates with dynamic variables for consistent messaging
                                 </p>
                             </div>
                         </div>
@@ -316,36 +310,36 @@ $client->emails->send([
                         Simple pricing
                     </h2>
                     <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-                        Start free, scale as you grow
+                        Pay only for what you send. No monthly minimums.
                     </p>
                     </div>
 
                     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto mt-16">
                     <Card className="flex flex-col p-6">
                         <div className="flex flex-col space-y-2">
-                            <h3 className="text-2xl font-bold">Starter</h3>
+                            <h3 className="text-2xl font-bold">Pay As You Go</h3>
                             <div className="flex items-baseline text-4xl font-bold">
-                                $9
-                                <span className="text-sm font-normal text-muted-foreground ml-1">/month</span>
+                                $0.0075
+                                <span className="text-sm font-normal text-muted-foreground ml-1">/SMS</span>
                             </div>
                         </div>
                         <div className="flex-1 mt-6">
                             <ul className="space-y-3 text-sm">
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>25,000 emails/month</span>
+                                    <span>No monthly commitment</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>1 domain</span>
+                                    <span>US & Canada coverage</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>2 API keys</span>
+                                    <span>Delivery tracking</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>Email support</span>
+                                    <span>API access</span>
                                 </li>
                             </ul>
                         </div>
@@ -365,7 +359,7 @@ $client->emails->send([
                         <div className="flex flex-col space-y-2">
                             <h3 className="text-2xl font-bold">Growth</h3>
                             <div className="flex items-baseline text-4xl font-bold">
-                                $29
+                                $49
                                 <span className="text-sm font-normal text-muted-foreground ml-1">/month</span>
                             </div>
                         </div>
@@ -373,15 +367,15 @@ $client->emails->send([
                             <ul className="space-y-3 text-sm">
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>100,000 emails/month</span>
+                                    <span>10,000 SMS included</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>5 domains</span>
+                                    <span>$0.005/SMS after</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>10 API keys</span>
+                                    <span>Dedicated phone number</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
@@ -405,15 +399,15 @@ $client->emails->send([
                             <ul className="space-y-3 text-sm">
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>Custom email volume</span>
+                                    <span>Volume discounts</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>Unlimited domains</span>
+                                    <span>Dedicated short code</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
-                                    <span>Dedicated IP</span>
+                                    <span>Custom sender ID</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <Check className="h-5 w-5 shrink-0" />
@@ -439,7 +433,7 @@ $client->emails->send([
                         Ready to get started?
                     </h2>
                     <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-                        Join thousands of developers who trust us with their email delivery
+                        Join developers who trust us with their SMS delivery
                     </p>
                     <div className="flex gap-4">
                         <Link to="/login">
@@ -517,7 +511,7 @@ $client->emails->send([
                     </div>
                     <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 md:flex-row">
                         <div className="flex items-center gap-2">
-                            <Mail className="h-5 w-5" />
+                            <MessageSquare className="h-5 w-5" />
                             <span className="font-bold">Sendbase</span>
                         </div>
                         <p className="text-center text-sm text-muted-foreground">

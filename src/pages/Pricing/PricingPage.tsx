@@ -9,7 +9,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { Mail, Check, X, ArrowRight } from 'lucide-react';
+import { MessageSquare, Check, X, ArrowRight } from 'lucide-react';
 import { useTheme } from '@/components/theme-provider';
 import { SEO } from '@/components/SEO';
 
@@ -18,31 +18,31 @@ export function PricingPage() {
 
     const pricingPlans = [
         {
-            name: 'Starter',
-            price: '$9',
-            period: '/month',
-            description: 'Perfect for small projects and startups',
+            name: 'Pay As You Go',
+            price: '$0.0075',
+            period: '/SMS',
+            description: 'Perfect for getting started with no commitment',
             features: [
-                '25,000 emails/month',
-                '1 domain',
-                '2 API keys',
-                '2 webhooks',
+                'No monthly minimum',
+                'US & Canada coverage',
+                'Delivery tracking',
+                'API access',
                 'Email support',
-                '7-day analytics',
+                'Basic analytics',
             ],
             cta: 'Get Started',
             popular: false,
         },
         {
             name: 'Growth',
-            price: '$29',
+            price: '$49',
             period: '/month',
-            description: 'For growing businesses with higher volume',
+            description: 'For growing businesses with consistent volume',
             features: [
-                '100,000 emails/month',
-                '5 domains',
-                '10 API keys',
-                '10 webhooks',
+                '10,000 SMS included',
+                '$0.005/SMS after included',
+                'Dedicated phone number',
+                'SMS templates',
                 'Priority support',
                 '30-day analytics',
             ],
@@ -53,14 +53,14 @@ export function PricingPage() {
             name: 'Enterprise',
             price: 'Custom',
             period: '',
-            description: 'For large-scale email operations',
+            description: 'For large-scale SMS operations',
             features: [
-                'Custom email volume',
-                'Unlimited domains',
-                'Unlimited API keys',
-                'Unlimited webhooks',
+                'Volume discounts',
+                'Dedicated short code',
+                'Custom sender ID',
+                'Unlimited templates',
                 '24/7 dedicated support',
-                'Dedicated IP',
+                'SLA guarantee',
             ],
             cta: 'Contact Sales',
             popular: false,
@@ -68,24 +68,23 @@ export function PricingPage() {
     ];
 
     const priceComparison = [
-        { volume: '10,000', sendbase: '$9', resend: '$20', smtp2go: '$15', sendgrid: '$19.95' },
-        { volume: '25,000', sendbase: '$9', resend: '$20', smtp2go: '$25', sendgrid: '$19.95' },
-        { volume: '50,000', sendbase: '$29', resend: '$20', smtp2go: '$50', sendgrid: '$19.95' },
-        { volume: '100,000', sendbase: '$29', resend: '$90', smtp2go: '$75', sendgrid: '$89.95' },
-        { volume: '250,000', sendbase: 'Custom', resend: 'Custom', smtp2go: '$166', sendgrid: '$89.95' },
+        { volume: '1,000', sendbase: '$7.50', twilio: '$8.75', vonage: '$7.80', plivo: '$7.50' },
+        { volume: '10,000', sendbase: '$49*', twilio: '$87.50', vonage: '$78.00', plivo: '$75.00' },
+        { volume: '50,000', sendbase: '$249', twilio: '$437.50', vonage: '$390.00', plivo: '$375.00' },
+        { volume: '100,000', sendbase: 'Custom', twilio: '$875.00', vonage: '$780.00', plivo: '$750.00' },
     ];
 
     const featureComparison = [
-        { feature: 'REST API', sendbase: true, resend: true, smtp2go: true, sendgrid: true },
-        { feature: 'Webhooks', sendbase: true, resend: true, smtp2go: true, sendgrid: true },
-        { feature: 'Email Templates', sendbase: true, resend: true, smtp2go: true, sendgrid: true },
-        { feature: 'Inbound Email', sendbase: true, resend: false, smtp2go: true, sendgrid: true },
-        { feature: 'Real-time Analytics', sendbase: true, resend: true, smtp2go: true, sendgrid: true },
-        { feature: 'Dedicated IP', sendbase: 'Growth+', resend: '$30+', smtp2go: '$75+', sendgrid: '$89.95+' },
-        { feature: 'Free Tier', sendbase: '25K/mo', resend: '3K/mo', smtp2go: '1K/mo', sendgrid: '100/day' },
-        { feature: 'DKIM/SPF/DMARC', sendbase: true, resend: true, smtp2go: true, sendgrid: true },
-        { feature: 'Bounce Handling', sendbase: true, resend: true, smtp2go: true, sendgrid: true },
-        { feature: 'SDK Support', sendbase: '5 languages', resend: '4 languages', smtp2go: '3 languages', sendgrid: '7 languages' },
+        { feature: 'REST API', sendbase: true, twilio: true, vonage: true, plivo: true },
+        { feature: 'Webhooks', sendbase: true, twilio: true, vonage: true, plivo: true },
+        { feature: 'SMS Templates', sendbase: true, twilio: true, vonage: true, plivo: true },
+        { feature: 'Two-way SMS', sendbase: 'Coming Soon', twilio: true, vonage: true, plivo: true },
+        { feature: 'Delivery Reports', sendbase: true, twilio: true, vonage: true, plivo: true },
+        { feature: 'Dedicated Number', sendbase: 'Growth+', twilio: '$1/mo', vonage: '$0.50/mo', plivo: '$0.80/mo' },
+        { feature: 'No Monthly Fee', sendbase: true, twilio: false, vonage: false, plivo: false },
+        { feature: 'Global Coverage', sendbase: 'US/CA', twilio: '180+ countries', vonage: '200+ countries', plivo: '190+ countries' },
+        { feature: 'Short Code', sendbase: 'Enterprise', twilio: '$1000/mo', vonage: '$1000/mo', plivo: '$500/mo' },
+        { feature: 'SDK Support', sendbase: '5 languages', twilio: '7 languages', vonage: '6 languages', plivo: '7 languages' },
     ];
 
     const renderFeatureValue = (value: boolean | string) => {
@@ -102,16 +101,16 @@ export function PricingPage() {
         <div className="min-h-screen">
             <SEO
                 title="Pricing"
-                description="Simple, transparent pricing for Sendbase email API. Start free with 25,000 emails/month. No hidden fees, scale as you grow."
+                description="Simple, transparent SMS API pricing. Pay as you go starting at $0.0075/SMS. No hidden fees, no monthly minimums."
                 canonical="/pricing"
-                keywords="email API pricing, transactional email cost, email service pricing, Sendbase pricing"
+                keywords="SMS API pricing, text message API cost, SMS service pricing, Sendbase pricing"
             />
             {/* Navigation */}
             <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 <div className="container mx-auto flex h-14 max-w-7xl items-center px-4 md:px-6">
                     <div className="mr-4 flex">
                         <Link to="/" className="mr-6 flex items-center space-x-2">
-                            <Mail className="h-6 w-6" />
+                            <MessageSquare className="h-6 w-6" />
                             <span className="font-bold">Sendbase</span>
                         </Link>
                     </div>
@@ -145,7 +144,7 @@ export function PricingPage() {
                             Simple, transparent pricing
                         </h1>
                         <p className="max-w-[42rem] leading-normal text-muted-foreground sm:text-xl sm:leading-8">
-                            No hidden fees. No surprises. Start free and scale as you grow.
+                            No hidden fees. No monthly minimums. Pay only for what you send.
                         </p>
                     </div>
                 </div>
@@ -220,7 +219,7 @@ export function PricingPage() {
                             How SendBase compares
                         </h2>
                         <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-                            See how our pricing stacks up against the competition
+                            See how our SMS pricing stacks up against the competition
                         </p>
                     </div>
 
@@ -230,11 +229,11 @@ export function PricingPage() {
                                 <Table>
                                     <TableHeader>
                                         <TableRow>
-                                            <TableHead className="w-[120px]">Emails/mo</TableHead>
+                                            <TableHead className="w-[120px]">SMS/mo</TableHead>
                                             <TableHead className="text-center font-bold bg-primary/10">SendBase</TableHead>
-                                            <TableHead className="text-center">Resend</TableHead>
-                                            <TableHead className="text-center">SMTP2Go</TableHead>
-                                            <TableHead className="text-center">SendGrid</TableHead>
+                                            <TableHead className="text-center">Twilio</TableHead>
+                                            <TableHead className="text-center">Vonage</TableHead>
+                                            <TableHead className="text-center">Plivo</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -244,9 +243,9 @@ export function PricingPage() {
                                                 <TableCell className="text-center font-semibold bg-primary/10">
                                                     {row.sendbase}
                                                 </TableCell>
-                                                <TableCell className="text-center">{row.resend}</TableCell>
-                                                <TableCell className="text-center">{row.smtp2go}</TableCell>
-                                                <TableCell className="text-center">{row.sendgrid}</TableCell>
+                                                <TableCell className="text-center">{row.twilio}</TableCell>
+                                                <TableCell className="text-center">{row.vonage}</TableCell>
+                                                <TableCell className="text-center">{row.plivo}</TableCell>
                                             </TableRow>
                                         ))}
                                     </TableBody>
@@ -254,7 +253,7 @@ export function PricingPage() {
                             </div>
                         </Card>
                         <p className="text-xs text-muted-foreground text-center mt-4">
-                            Prices shown are for transactional email plans. Competitor pricing as of December 2024.
+                            * Growth plan includes 10,000 SMS. Prices for US destinations. Competitor pricing as of December 2024.
                         </p>
                     </div>
                 </div>
@@ -268,7 +267,7 @@ export function PricingPage() {
                             Feature comparison
                         </h2>
                         <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-                            Everything you need to send email at scale
+                            Everything you need to send SMS at scale
                         </p>
                     </div>
 
@@ -280,9 +279,9 @@ export function PricingPage() {
                                         <TableRow>
                                             <TableHead className="w-[180px]">Feature</TableHead>
                                             <TableHead className="text-center font-bold bg-primary/10">SendBase</TableHead>
-                                            <TableHead className="text-center">Resend</TableHead>
-                                            <TableHead className="text-center">SMTP2Go</TableHead>
-                                            <TableHead className="text-center">SendGrid</TableHead>
+                                            <TableHead className="text-center">Twilio</TableHead>
+                                            <TableHead className="text-center">Vonage</TableHead>
+                                            <TableHead className="text-center">Plivo</TableHead>
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -293,13 +292,13 @@ export function PricingPage() {
                                                     {renderFeatureValue(row.sendbase)}
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    {renderFeatureValue(row.resend)}
+                                                    {renderFeatureValue(row.twilio)}
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    {renderFeatureValue(row.smtp2go)}
+                                                    {renderFeatureValue(row.vonage)}
                                                 </TableCell>
                                                 <TableCell className="text-center">
-                                                    {renderFeatureValue(row.sendgrid)}
+                                                    {renderFeatureValue(row.plivo)}
                                                 </TableCell>
                                             </TableRow>
                                         ))}
@@ -322,27 +321,27 @@ export function PricingPage() {
 
                     <div className="max-w-3xl mx-auto space-y-6">
                         <Card className="p-6">
-                            <h3 className="font-semibold text-lg mb-2">What counts as an email?</h3>
+                            <h3 className="font-semibold text-lg mb-2">How does SMS pricing work?</h3>
                             <p className="text-muted-foreground">
-                                Each email sent to one recipient counts as one email. If you send an email to 3 recipients, that counts as 3 emails. Bounced emails and failed deliveries do not count against your quota.
+                                Each SMS message sent counts as one message. Long messages (over 160 characters) are split into multiple segments and charged accordingly. We charge per segment for accurate billing.
+                            </p>
+                        </Card>
+                        <Card className="p-6">
+                            <h3 className="font-semibold text-lg mb-2">What countries do you support?</h3>
+                            <p className="text-muted-foreground">
+                                We currently support SMS delivery to the United States and Canada. International coverage is coming soon. Contact us if you need global SMS delivery.
                             </p>
                         </Card>
                         <Card className="p-6">
                             <h3 className="font-semibold text-lg mb-2">Can I upgrade or downgrade anytime?</h3>
                             <p className="text-muted-foreground">
-                                Yes! You can upgrade or downgrade your plan at any time. When you upgrade, you'll be charged the prorated difference. When you downgrade, the change takes effect at the start of your next billing cycle.
-                            </p>
-                        </Card>
-                        <Card className="p-6">
-                            <h3 className="font-semibold text-lg mb-2">What happens if I exceed my email limit?</h3>
-                            <p className="text-muted-foreground">
-                                We'll notify you when you're approaching your limit. On paid plans, you can enable overage billing to continue sending at a per-email rate. On the Starter plan, you can upgrade to Growth for more volume.
+                                Yes! You can switch between plans at any time. When you upgrade, you'll be charged the prorated difference. When you downgrade, the change takes effect at the start of your next billing cycle.
                             </p>
                         </Card>
                         <Card className="p-6">
                             <h3 className="font-semibold text-lg mb-2">Do you offer volume discounts?</h3>
                             <p className="text-muted-foreground">
-                                Yes! For high-volume senders (500K+ emails/month), we offer custom Enterprise pricing with significant discounts. Contact our sales team to discuss your needs.
+                                Yes! For high-volume senders (100K+ SMS/month), we offer custom Enterprise pricing with significant discounts. Contact our sales team to discuss your needs.
                             </p>
                         </Card>
                     </div>
@@ -357,7 +356,7 @@ export function PricingPage() {
                             Ready to get started?
                         </h2>
                         <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
-                            Start sending emails in minutes. No credit card required.
+                            Start sending SMS in minutes. No credit card required.
                         </p>
                         <div className="flex gap-4 mt-4">
                             <Link to="/login">
@@ -433,7 +432,7 @@ export function PricingPage() {
                     </div>
                     <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t pt-8 md:flex-row">
                         <div className="flex items-center gap-2">
-                            <Mail className="h-5 w-5" />
+                            <MessageSquare className="h-5 w-5" />
                             <span className="font-bold">Sendbase</span>
                         </div>
                         <p className="text-center text-sm text-muted-foreground">

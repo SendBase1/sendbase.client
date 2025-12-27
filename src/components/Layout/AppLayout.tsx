@@ -12,9 +12,6 @@ import {
 } from '../ui/sheet';
 import {
   Mail,
-  Send,
-  Database,
-  MessageSquare,
   LayoutDashboard,
   LogOut,
   Moon,
@@ -25,8 +22,6 @@ import {
   CreditCard,
   Settings,
   HelpCircle,
-  FileText,
-  Inbox,
   Menu,
 } from 'lucide-react';
 
@@ -38,13 +33,14 @@ export function AppLayout() {
 
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
 
+  // Email features temporarily hidden - SMS only for now
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { path: '/domains', label: 'Domains', icon: Database },
-    { path: '/templates', label: 'Templates', icon: FileText },
-    { path: '/send', label: 'Send', icon: Send },
-    { path: '/messages', label: 'Messages', icon: MessageSquare },
-    { path: '/inbound', label: 'Inbound', icon: Inbox },
+    // { path: '/domains', label: 'Domains', icon: Database },         // Email feature - coming soon
+    // { path: '/templates', label: 'Templates', icon: FileText },     // Email feature - coming soon
+    // { path: '/send', label: 'Send', icon: Send },                   // Email feature - coming soon
+    // { path: '/messages', label: 'Messages', icon: MessageSquare },  // Email feature - coming soon
+    // { path: '/inbound', label: 'Inbound', icon: Inbox },            // Email feature - coming soon
     { path: '/apikeys', label: 'API Keys', icon: Key },
     { path: '/webhooks', label: 'Webhooks', icon: Webhook },
     { path: '/settings', label: 'Settings', icon: Settings },
