@@ -32,7 +32,7 @@ export function PrivacyPolicy() {
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4">1. Introduction</h2>
               <p className="text-muted-foreground leading-relaxed">
-                This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our email delivery service. We are committed to protecting your privacy and handling your data in an open and transparent manner.
+                This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our email processing service. We are committed to protecting your privacy and handling your data in an open and transparent manner.
               </p>
             </section>
 
@@ -52,14 +52,14 @@ export function PrivacyPolicy() {
 
               <h3 className="text-lg font-medium mb-3 mt-6">2.2 Email Data</h3>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                When you use our Service to send emails, we process:
+                When you use our Service to receive and process emails, we process:
               </p>
               <ul className="list-disc pl-6 text-muted-foreground space-y-2">
                 <li>Sender and recipient email addresses</li>
                 <li>Email subject lines</li>
-                <li>Email content (for delivery purposes only)</li>
-                <li>Delivery status and timestamps</li>
-                <li>Bounce and complaint notifications</li>
+                <li>Email content (for processing purposes only)</li>
+                <li>Processing status and timestamps</li>
+                <li>Webhook delivery notifications</li>
               </ul>
 
               <h3 className="text-lg font-medium mb-3 mt-6">2.3 Technical Data</h3>
@@ -82,8 +82,8 @@ export function PrivacyPolicy() {
               </p>
               <ul className="list-disc pl-6 text-muted-foreground space-y-2">
                 <li>Provide and maintain the Service</li>
-                <li>Process and deliver your emails</li>
-                <li>Monitor delivery status and provide analytics</li>
+                <li>Process and route your inbound emails</li>
+                <li>Monitor processing status and provide analytics</li>
                 <li>Detect and prevent abuse, fraud, and policy violations</li>
                 <li>Communicate with you about your account and the Service</li>
                 <li>Comply with legal obligations</li>
@@ -98,8 +98,8 @@ export function PrivacyPolicy() {
               </p>
               <ul className="list-disc pl-6 text-muted-foreground space-y-2">
                 <li><strong>Account data:</strong> Retained while your account is active and for 30 days after deletion</li>
-                <li><strong>Email metadata:</strong> Retained for 90 days for delivery tracking and analytics</li>
-                <li><strong>Email content:</strong> Not stored after successful delivery processing</li>
+                <li><strong>Email metadata:</strong> Retained for 90 days for tracking and analytics</li>
+                <li><strong>Email content:</strong> Not stored after successful processing</li>
                 <li><strong>Logs:</strong> Retained for 30 days for security and debugging purposes</li>
               </ul>
             </section>
@@ -110,7 +110,7 @@ export function PrivacyPolicy() {
                 We do not sell your personal information. We may share your information with:
               </p>
               <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-                <li><strong>Service providers:</strong> Including Amazon Web Services for email delivery infrastructure</li>
+                <li><strong>Service providers:</strong> Including Amazon Web Services for email processing infrastructure</li>
                 <li><strong>Legal requirements:</strong> When required by law, court order, or governmental authority</li>
                 <li><strong>Protection of rights:</strong> To protect our rights, privacy, safety, or property</li>
                 <li><strong>Business transfers:</strong> In connection with a merger, acquisition, or sale of assets</li>
