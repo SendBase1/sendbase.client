@@ -11,7 +11,7 @@ export function TermsOfService() {
     <div className="min-h-screen bg-background">
       <SEO
         title="Terms of Service"
-        description="Read the Sendbase Terms of Service. Understand your rights and responsibilities when using our email delivery API."
+        description="Read the Sendbase Terms of Service. Understand your rights and responsibilities when using our email processing API."
         canonical="/terms"
       />
       <div className="max-w-4xl mx-auto px-4 py-12">
@@ -32,14 +32,14 @@ export function TermsOfService() {
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4">1. Acceptance of Terms</h2>
               <p className="text-muted-foreground leading-relaxed">
-                By accessing or using our email delivery service ("Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service. We reserve the right to update these Terms at any time, and your continued use of the Service constitutes acceptance of any changes.
+                By accessing or using our email processing service ("Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not use the Service. We reserve the right to update these Terms at any time, and your continued use of the Service constitutes acceptance of any changes.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4">2. Description of Service</h2>
               <p className="text-muted-foreground leading-relaxed">
-                Our Service provides transactional and marketing email delivery through Amazon Web Services Simple Email Service (AWS SES). The Service includes email sending capabilities, domain verification, delivery tracking, and related analytics features.
+                Our Service provides inbound email processing and webhook delivery through Amazon Web Services. The Service includes email receiving capabilities, domain verification, message routing, and related analytics features.
               </p>
             </section>
 
@@ -62,41 +62,39 @@ export function TermsOfService() {
                 You agree to use the Service only for lawful purposes and in compliance with our Acceptable Use Policy. You must not use the Service to:
               </p>
               <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-                <li>Send unsolicited bulk email (spam)</li>
-                <li>Send emails containing malware, phishing attempts, or fraudulent content</li>
+                <li>Process emails containing malware, phishing attempts, or fraudulent content</li>
                 <li>Harvest email addresses or personal information without consent</li>
-                <li>Violate any applicable laws or regulations, including CAN-SPAM, GDPR, and CCPA</li>
+                <li>Violate any applicable laws or regulations, including GDPR and CCPA</li>
                 <li>Impersonate any person or entity</li>
-                <li>Send content that is defamatory, obscene, or otherwise objectionable</li>
+                <li>Process content that is defamatory, obscene, or otherwise objectionable</li>
               </ul>
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold mb-4">5. Email Sending Requirements</h2>
+              <h2 className="text-xl font-semibold mb-4">5. Email Processing Requirements</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 When using our Service, you must:
               </p>
               <ul className="list-disc pl-6 text-muted-foreground space-y-2">
-                <li>Only send emails to recipients who have provided valid consent</li>
-                <li>Include a clear and functional unsubscribe mechanism in marketing emails</li>
-                <li>Include your valid physical mailing address in commercial emails</li>
-                <li>Honor unsubscribe requests within 10 business days</li>
-                <li>Maintain accurate and up-to-date mailing lists</li>
-                <li>Promptly remove bounced and invalid email addresses</li>
+                <li>Ensure you have proper authorization to receive emails on your configured domains</li>
+                <li>Handle received email data in compliance with applicable privacy laws</li>
+                <li>Securely store and process any personal information received via email</li>
+                <li>Configure webhooks to secure endpoints that properly validate requests</li>
+                <li>Respond to webhook deliveries in a timely manner</li>
               </ul>
             </section>
 
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4">6. Domain Verification</h2>
               <p className="text-muted-foreground leading-relaxed">
-                You must verify ownership of any domain used with our Service by configuring the required DNS records. You represent and warrant that you have the authority to send emails from any domain you verify through our Service.
+                You must verify ownership of any domain used with our Service by configuring the required DNS records. You represent and warrant that you have the authority to receive and process emails on any domain you verify through our Service.
               </p>
             </section>
 
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4">7. Service Limitations</h2>
               <p className="text-muted-foreground leading-relaxed">
-                The Service is provided subject to usage limits and rate restrictions. We reserve the right to throttle, suspend, or terminate accounts that exceed reasonable usage limits, generate excessive bounces or complaints, or otherwise abuse the Service.
+                The Service is provided subject to usage limits and rate restrictions. We reserve the right to throttle, suspend, or terminate accounts that exceed reasonable usage limits or otherwise abuse the Service.
               </p>
             </section>
 
@@ -110,7 +108,7 @@ export function TermsOfService() {
             <section className="mb-8">
               <h2 className="text-xl font-semibold mb-4">9. Disclaimer of Warranties</h2>
               <p className="text-muted-foreground leading-relaxed">
-                THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. WE DO NOT GUARANTEE THAT THE SERVICE WILL BE UNINTERRUPTED, SECURE, OR ERROR-FREE, OR THAT ANY EMAILS WILL BE DELIVERED SUCCESSFULLY.
+                THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. WE DO NOT GUARANTEE THAT THE SERVICE WILL BE UNINTERRUPTED, SECURE, OR ERROR-FREE, OR THAT ALL EMAILS WILL BE PROCESSED SUCCESSFULLY.
               </p>
             </section>
 
