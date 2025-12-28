@@ -45,6 +45,19 @@ import type {
   InboundMessageResponse,
   InboundMessageListResponse,
   InboundEmailDownloadResponse,
+  // SMS Types
+  SmsMessageResponse,
+  SmsMessageListResponse,
+  SendSmsRequest,
+  SendSmsResponse,
+  ListSmsParams,
+  SmsTemplateResponse,
+  SmsTemplateListResponse,
+  CreateSmsTemplateRequest,
+  UpdateSmsTemplateRequest,
+  SmsPhoneNumberResponse,
+  SmsPhoneNumberListResponse,
+  ProvisionPhoneNumberRequest,
 } from './types';
 import { API_BASE_URL } from './config';
 import { triggerLogout } from '../contexts/AuthContext';
@@ -774,5 +787,145 @@ export const templateApi = {
     });
     if (!response.ok) throw new Error('Failed to preview template');
     return response.json();
+  },
+};
+
+// SMS API
+export const smsApi = {
+  async send(data: SendSmsRequest): Promise<SendSmsResponse> {
+    const response = await fetchWithAuth('/api/v1/sms/send', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to send SMS');
+    }
+    return response.json();
+  },
+
+  async list(params: ListSmsParams = {}): Promise<SmsMessageListResponse> {
+    const queryParams = new URLSearchParams();
+    if (params.page) queryParams.set('page', params.page.toString());
+    if (params.page_size) queryParams.set('pageSize', params.page_size.toString());
+    if (params.status !== undefined) queryParams.set('status', params.status.toString());
+    if (params.from) queryParams.set('from', params.from);
+    if (params.to) queryParams.set('to', params.to);
+
+    const queryString = queryParams.toString();
+    const url = `/api/v1/sms${queryString ? `?${queryString}` : ''}`;
+
+    const response = await fetchWithAuth(url);
+    if (!response.ok) throw new Error('Failed to list SMS messages');
+    return response.json();
+  },
+
+  async getById(id: string): Promise<SmsMessageResponse> {
+    const response = await fetchWithAuth(`/api/v1/sms/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch SMS');
+    return response.json();
+  },
+
+  async cancel(id: string): Promise<{ message: string }> {
+    const response = await fetchWithAuth(`/api/v1/sms/${id}/cancel`, {
+      method: 'POST',
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to cancel SMS');
+    }
+    return response.json();
+  },
+};
+
+// SMS Template API
+export const smsTemplateApi = {
+  async getAll(page = 1, pageSize = 20): Promise<SmsTemplateListResponse> {
+    const response = await fetchWithAuth(`/api/v1/sms/templates?page=${page}&pageSize=${pageSize}`);
+    if (!response.ok) throw new Error('Failed to fetch SMS templates');
+    return response.json();
+  },
+
+  async getById(id: string): Promise<SmsTemplateResponse> {
+    const response = await fetchWithAuth(`/api/v1/sms/templates/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch SMS template');
+    return response.json();
+  },
+
+  async create(data: CreateSmsTemplateRequest): Promise<SmsTemplateResponse> {
+    const response = await fetchWithAuth('/api/v1/sms/templates', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to create SMS template');
+    }
+    return response.json();
+  },
+
+  async update(id: string, data: UpdateSmsTemplateRequest): Promise<SmsTemplateResponse> {
+    const response = await fetchWithAuth(`/api/v1/sms/templates/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to update SMS template');
+    }
+    return response.json();
+  },
+
+  async delete(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/sms/templates/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) throw new Error('Failed to delete SMS template');
+  },
+};
+
+// SMS Phone Number API
+export const smsPhoneNumberApi = {
+  async getAll(): Promise<SmsPhoneNumberListResponse> {
+    const response = await fetchWithAuth('/api/v1/sms/phone-numbers');
+    if (!response.ok) throw new Error('Failed to fetch phone numbers');
+    return response.json();
+  },
+
+  async getById(id: string): Promise<SmsPhoneNumberResponse> {
+    const response = await fetchWithAuth(`/api/v1/sms/phone-numbers/${id}`);
+    if (!response.ok) throw new Error('Failed to fetch phone number');
+    return response.json();
+  },
+
+  async setDefault(id: string): Promise<{ message: string }> {
+    const response = await fetchWithAuth(`/api/v1/sms/phone-numbers/${id}/set-default`, {
+      method: 'POST',
+    });
+    if (!response.ok) throw new Error('Failed to set default phone number');
+    return response.json();
+  },
+
+  async provision(data: ProvisionPhoneNumberRequest): Promise<SmsPhoneNumberResponse> {
+    const response = await fetchWithAuth('/api/v1/sms/phone-numbers', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || 'Failed to provision phone number');
+    }
+    return response.json();
+  },
+
+  async release(id: string): Promise<void> {
+    const response = await fetchWithAuth(`/api/v1/sms/phone-numbers/${id}`, {
+      method: 'DELETE',
+    });
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.error || 'Failed to release phone number');
+    }
   },
 };
