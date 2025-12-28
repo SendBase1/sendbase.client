@@ -23,6 +23,10 @@ import {
   Settings,
   HelpCircle,
   Menu,
+  MessageSquare,
+  Send,
+  FileText,
+  Phone,
 } from 'lucide-react';
 
 export function AppLayout() {
@@ -31,16 +35,31 @@ export function AppLayout() {
   const { logout, userEmail } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
+  const isActive = (path: string) => {
+    // For section root paths (like /sms), only exact match to avoid highlighting parent when on child
+    if (path === '/sms' || path === '/dashboard') {
+      return location.pathname === path;
+    }
+    // For other paths, allow prefix matching for nested routes (e.g., /sms/messages/:id)
+    return location.pathname === path || location.pathname.startsWith(path + '/');
+  };
 
-  // Email features temporarily hidden - SMS only for now
+  // Navigation items
   const navItems = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    // { path: '/domains', label: 'Domains', icon: Database },         // Email feature - coming soon
-    // { path: '/templates', label: 'Templates', icon: FileText },     // Email feature - coming soon
-    // { path: '/send', label: 'Send', icon: Send },                   // Email feature - coming soon
-    // { path: '/messages', label: 'Messages', icon: MessageSquare },  // Email feature - coming soon
-    // { path: '/inbound', label: 'Inbound', icon: Inbox },            // Email feature - coming soon
+    // SMS Features
+    { path: '/sms', label: 'SMS Dashboard', icon: MessageSquare },
+    { path: '/sms/send', label: 'Send SMS', icon: Send },
+    { path: '/sms/messages', label: 'SMS Messages', icon: MessageSquare },
+    { path: '/sms/templates', label: 'SMS Templates', icon: FileText },
+    { path: '/sms/phone-numbers', label: 'Phone Numbers', icon: Phone },
+    // Email features temporarily hidden - coming soon
+    // { path: '/domains', label: 'Domains', icon: Database },
+    // { path: '/templates', label: 'Templates', icon: FileText },
+    // { path: '/send', label: 'Send', icon: Send },
+    // { path: '/messages', label: 'Messages', icon: MessageSquare },
+    // { path: '/inbound', label: 'Inbound', icon: Inbox },
+    // Common features
     { path: '/apikeys', label: 'API Keys', icon: Key },
     { path: '/webhooks', label: 'Webhooks', icon: Webhook },
     { path: '/settings', label: 'Settings', icon: Settings },

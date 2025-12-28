@@ -35,6 +35,15 @@ const TemplatesPage = lazy(() => import('./pages/Templates').then(m => ({ defaul
 const TemplateDetailsPage = lazy(() => import('./pages/Templates').then(m => ({ default: m.TemplateDetailsPage })));
 const InboundMessagesPage = lazy(() => import('./pages/Inbound/InboundMessagesPage').then(m => ({ default: m.InboundMessagesPage })));
 
+// SMS Pages
+const SmsDashboardPage = lazy(() => import('./pages/Sms').then(m => ({ default: m.SmsDashboardPage })));
+const SendSmsPage = lazy(() => import('./pages/Sms').then(m => ({ default: m.SendSmsPage })));
+const SmsMessagesPage = lazy(() => import('./pages/Sms').then(m => ({ default: m.SmsMessagesPage })));
+const SmsMessageDetailsPage = lazy(() => import('./pages/Sms').then(m => ({ default: m.SmsMessageDetailsPage })));
+const SmsTemplatesPage = lazy(() => import('./pages/Sms').then(m => ({ default: m.SmsTemplatesPage })));
+const SmsTemplateDetailsPage = lazy(() => import('./pages/Sms').then(m => ({ default: m.SmsTemplateDetailsPage })));
+const PhoneNumbersPage = lazy(() => import('./pages/Sms').then(m => ({ default: m.PhoneNumbersPage })));
+
 const queryClient = new QueryClient();
 
 // Loading fallback component - minimal branded loader for lazy-loaded pages
@@ -101,6 +110,14 @@ function App() {
                                     <Route path="/settings" element={<SettingsPage />} />
                                     <Route path="/billing" element={<BillingPage />} />
                                     <Route path="/profile" element={<ProfilePage />} />
+                                    {/* SMS Routes */}
+                                    <Route path="/sms" element={<SmsDashboardPage />} />
+                                    <Route path="/sms/send" element={<SendSmsPage />} />
+                                    <Route path="/sms/messages" element={<SmsMessagesPage />} />
+                                    <Route path="/sms/messages/:id" element={<SmsMessageDetailsPage />} />
+                                    <Route path="/sms/templates" element={<SmsTemplatesPage />} />
+                                    <Route path="/sms/templates/:id" element={<SmsTemplateDetailsPage />} />
+                                    <Route path="/sms/phone-numbers" element={<PhoneNumbersPage />} />
                                 </Route>
 
                                 {/* Catch-all redirect */}

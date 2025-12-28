@@ -480,3 +480,111 @@ export interface AttachmentDownloadResponse {
   download_url: string;
   expires_at_utc: string;
 }
+
+// SMS Types
+
+export interface SmsMessageResponse {
+  id: string;
+  from_number: string;
+  to_number: string;
+  body: string;
+  template_id?: string;
+  aws_message_id?: string;
+  status: number;
+  status_text: string;
+  segment_count: number;
+  requested_at_utc: string;
+  scheduled_at_utc?: string;
+  sent_at_utc?: string;
+  error?: string;
+}
+
+export interface SmsMessageListResponse {
+  messages: SmsMessageResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface SendSmsRequest {
+  to: string;
+  from?: string;
+  body: string;
+  template_id?: string;
+  template_variables?: Record<string, string>;
+  scheduled_at_utc?: string;
+}
+
+export interface SendSmsResponse {
+  message_id: string;
+  aws_message_id?: string;
+  status: number;
+  status_text: string;
+  segment_count: number;
+  requested_at_utc: string;
+  scheduled_at_utc?: string;
+  error?: string;
+}
+
+export interface ListSmsParams {
+  page?: number;
+  page_size?: number;
+  status?: number;
+  from?: string;
+  to?: string;
+}
+
+// SMS Template Types
+
+export interface SmsTemplateResponse {
+  id: string;
+  name: string;
+  body: string;
+  is_active: boolean;
+  created_at_utc: string;
+  updated_at_utc?: string;
+}
+
+export interface SmsTemplateListResponse {
+  templates: SmsTemplateResponse[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface CreateSmsTemplateRequest {
+  name: string;
+  body: string;
+}
+
+export interface UpdateSmsTemplateRequest {
+  name?: string;
+  body?: string;
+  is_active?: boolean;
+}
+
+// SMS Phone Number Types
+
+export interface SmsPhoneNumberResponse {
+  id: string;
+  phone_number: string;
+  number_type: string;
+  number_type_display: string;
+  country: string;
+  monthly_fee_cents: number;
+  monthly_fee_display: string;
+  is_default: boolean;
+  is_active: boolean;
+  provisioned_at_utc?: string;
+  created_at_utc: string;
+}
+
+export interface SmsPhoneNumberListResponse {
+  phone_numbers: SmsPhoneNumberResponse[];
+  total: number;
+}
+
+export interface ProvisionPhoneNumberRequest {
+  number_type: 'TollFree' | 'LongCode';
+  country: string;
+}
