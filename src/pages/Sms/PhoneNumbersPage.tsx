@@ -233,15 +233,13 @@ export function PhoneNumbersPage() {
                               Set Default
                             </Button>
                           )}
-                          {phoneNumbers.length > 1 && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => setReleasePhoneId(phone.id)}
-                            >
-                              <Trash2 className="h-4 w-4 text-destructive" />
-                            </Button>
-                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setReleasePhoneId(phone.id)}
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -339,7 +337,11 @@ export function PhoneNumbersPage() {
         open={!!releasePhoneId}
         onOpenChange={(open) => !open && setReleasePhoneId(null)}
         title="Release Phone Number"
-        description="Are you sure you want to release this phone number? This will permanently remove it from your account and you may not be able to get the same number back."
+        description={
+          phoneNumbers.length === 1
+            ? "Are you sure you want to release your only phone number? This will disable SMS sending until you provision a new number. You may not be able to get the same number back."
+            : "Are you sure you want to release this phone number? This will permanently remove it from your account and you may not be able to get the same number back."
+        }
         confirmText="Release"
         onConfirm={handleRelease}
         variant="danger"
