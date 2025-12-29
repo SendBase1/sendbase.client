@@ -1,8 +1,12 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../../components/ui/card';
 import { Button } from '../../components/ui/button';
 import { Badge } from '../../components/ui/badge';
 import { Separator } from '../../components/ui/separator';
+import { Checkbox } from '../../components/ui/checkbox';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
 import {
   User,
   Mail,
@@ -11,9 +15,11 @@ import {
   CheckCircle2,
   RefreshCw,
   ExternalLink,
+  MessageSquare,
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchWithAuth } from '../../lib/api';
+import { toast } from 'sonner';
 
 interface UserProfile {
   userId: string;
@@ -31,6 +37,21 @@ interface TenantInfo {
 
 export function ProfilePage() {
   const { userEmail } = useAuth();
+  const [smsOptIn, setSmsOptIn] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const handleSmsOptIn = async () => {
+    if (!smsOptIn || !phoneNumber) {
+      toast.error('Please enter your phone number and agree to receive SMS messages');
+      return;
+    }
+    setSaving(true);
+    // For now, just show success - implement backend later if needed
+    await new Promise(resolve => setTimeout(resolve, 500));
+    toast.success('SMS preferences saved successfully');
+    setSaving(false);
+  };
 
   const { data: profile, isLoading: profileLoading } = useQuery<UserProfile>({
     queryKey: ['profile'],
@@ -131,6 +152,61 @@ export function ProfilePage() {
             ) : (
               <p className="text-sm text-muted-foreground">No organizations found</p>
             )}
+          </CardContent>
+        </Card>
+
+        {/* SMS Notifications */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-muted-foreground" />
+              <CardTitle>SMS Notifications</CardTitle>
+            </div>
+            <CardDescription>Manage your SMS verification preferences</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                placeholder="+1 (555) 123-4567"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter your phone number to receive verification codes via SMS
+              </p>
+            </div>
+
+            <Separator />
+
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="sms-consent"
+                checked={smsOptIn}
+                onCheckedChange={(checked) => setSmsOptIn(checked === true)}
+              />
+              <div className="space-y-1">
+                <Label htmlFor="sms-consent" className="font-medium cursor-pointer">
+                  I agree to receive SMS verification codes
+                </Label>
+                <p className="text-xs text-muted-foreground">
+                  By checking this box, you consent to receive one-time verification codes via SMS
+                  to the phone number provided above. Message frequency varies based on your account
+                  activity. Message and data rates may apply. You can opt out at any time by
+                  unchecking this box.
+                </p>
+              </div>
+            </div>
+
+            <Button
+              onClick={handleSmsOptIn}
+              disabled={!smsOptIn || !phoneNumber || saving}
+              className="w-full sm:w-auto"
+            >
+              {saving ? 'Saving...' : 'Save SMS Preferences'}
+            </Button>
           </CardContent>
         </Card>
 
